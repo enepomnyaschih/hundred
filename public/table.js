@@ -126,15 +126,21 @@ JW.extend(Table, JW.UI.Component, {
 		var ufactor = JW.mod(factor, 2);
 		var sfactor = JW.smod(factor, 2);
 		var radius = this.el.width() / 2;
+		var xface = -Math.sin(Math.PI * sfactor / 2);
+		var xback = Math.cos(Math.PI * ufactor / 2);
 		
-		Util.setTransform(this.getElement("face"), "scaleX(" + Math.min(1, 0.005 + Math.cos(Math.PI * sfactor / 2)) + ")");
-		Util.setTransform(this.getElement("back"), "scaleX(" + Math.min(1, 0.005 + Math.sin(Math.PI * ufactor / 2)) + ")");
+		Util.setTransform(this.getElement("face"),
+			"skewY(" + (5 * xface) + "deg) " +
+			"scaleX(" + Math.min(1, 0.005 + Math.cos(Math.PI * sfactor / 2)) + ")");
+		Util.setTransform(this.getElement("back"),
+			"skewY(" + (5 * xback) + "deg) " +
+			"scaleX(" + Math.min(1, 0.005 + Math.sin(Math.PI * ufactor / 2)) + ")");
 		
 		this.getElement("face-mask").css("opacity", .8 * (1 - Math.cos(Math.PI * sfactor / 2)));
 		this.getElement("back-mask").css("opacity", .8 * (1 - Math.sin(Math.PI * ufactor / 2)));
 		
-		this.getElement("face").css("left", -(radius * Math.sin(Math.PI * sfactor / 2)) + "px");
-		this.getElement("back").css("left", (radius * Math.cos(Math.PI * ufactor / 2)) + "px");
+		this.getElement("face").css("left", (radius * xface) + "px");
+		this.getElement("back").css("left", (radius * xback) + "px");
 	}
 });
 

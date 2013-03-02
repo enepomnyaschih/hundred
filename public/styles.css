@@ -12,15 +12,15 @@ html {
 .table {
 	position: absolute;
 	left: 168px;
-	top: 122px;
+	top: 82px;
 	width: 420px;
-	height: 240px;
+	height: 280px;
 	overflow: hidden;
 }
 .table-back {
 	position: absolute;
 	left: 0;
-	top: 0;
+	top: 40px;
 	width: 420px;
 	height: 240px;
 	background: transparent url(images/table.png) no-repeat 0 0;
@@ -28,7 +28,7 @@ html {
 .table-face {
 	position: absolute;
 	left: 0;
-	top: 0;
+	top: 40px;
 	width: 420px;
 	height: 240px;
 	background: transparent url(images/table-back.png) no-repeat 0 0;
