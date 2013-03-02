@@ -1,12 +1,16 @@
+html {
+	background-color: black;
+}
 .application {
-	position: absolute;
-	width: 750px;
+	position: relative;
+	margin: auto;
+	width: 760px;
 	height: 410px;
 	background: transparent url(images/application.png) no-repeat 0 0;
 }
 .table {
 	position: absolute;
-	left: 163px;
+	left: 168px;
 	top: 122px;
 	width: 420px;
 	height: 240px;
@@ -69,4 +73,15 @@
 }
 .penalty-box-cell.active {
 	background-image: url(images/penalty-active.png);
+}
+.score-box {
+	position: absolute;
+	width: 96px;
+	height: 46px;
+}
+.score-box-digit {
+	position: absolute;
+	width: 31px;
+	height: 46px;
+	background: transparent none no-repeat 0 0;
 }

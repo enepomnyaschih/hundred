@@ -3,7 +3,7 @@
 	this.scoreData = new ScoreData();
 	this.table = null;
 	this.bank = null;
-	this.score = [];
+	this.scores = [];
 	this._lastKeyCode = null;
 	this._onKeyDown = JW.inScope(this._onKeyDown, this);
 };
@@ -21,22 +21,28 @@ JW.extend(Application, JW.UI.Component, {
 	renderTable: function() {
 		return this.table = new Table();
 	},
-	/*
+	
 	renderBank: function() {
-		return this.bank = new BankBox(this.scoreData);
+		return this.bank = new ScoreBox();
 	},
 	
 	renderScore0: function() {
-		return this.scores[0] = new ScoreBox(this.scoreData, 0);
+		return this.scores[0] = new ScoreBox();
 	},
 	
 	renderScore1: function() {
-		return this.scores[1] = new ScoreBox(this.scoreData, 1);
+		return this.scores[1] = new ScoreBox();
 	},
-	*/
+	
 	// override
 	renderComponent: function() {
 		this._super();
+		this.bank.el.css("left", "331px");
+		this.bank.el.css("top", "25px");
+		this.scores[0].el.css("left", "17px");
+		this.scores[0].el.css("top", "213px");
+		this.scores[1].el.css("left", "645px");
+		this.scores[1].el.css("top", "213px");
 		JW.UI.windowEl.bind("keydown", this._onKeyDown);
 	},
 	
