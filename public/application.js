@@ -5,6 +5,7 @@
 	this.bank = null;
 	this.scores = [];
 	this._lastKeyCode = null;
+	this._lastPrice = 0;
 	this._onKeyDown = JW.inScope(this._onKeyDown, this);
 };
 
@@ -16,6 +17,7 @@ JW.extend(Application, JW.UI.Component, {
 	BankBox bank;
 	Array<ScoreBox> scores;
 	Integer _lastKeyCode;
+	Integer _lastPrice;
 	*/
 	
 	renderTable: function() {
@@ -68,9 +70,12 @@ JW.extend(Application, JW.UI.Component, {
 			case 188: this.scoreData.pullBank(0); break;
 			case 190: this.scoreData.pullBank(1); break;
 			case 32: this.table.roll(); break;
+			case 107:
+				this.scoreData.increaseBank(this._lastPrice);
+				this._lastPrice = 0;
+				break;
 			default:
-				var price = this.table.openAnswer(event.keyCode - 49);
-				this.scoreData.increaseBank(price);
+				this._lastPrice = this.table.openAnswer(event.keyCode - 97);
 				break;
 		}
 	}
@@ -87,7 +92,8 @@ JW.UI.template(Application, {
 });
 
 Application.reservedKeys = JW.Array.indexBy([
-	49, 50, 51, 52, 53, 54, // Numbers from 1 to 6 (main keyboard)
+	97, 98, 99, 100, 101, 102, // Numbers from 1 to 6 (num keyboard)
+	107, // num +
 	90,  // z
 	88,  // x
 	188, // <
