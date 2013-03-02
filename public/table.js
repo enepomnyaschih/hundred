@@ -33,6 +33,8 @@ JW.extend(Table, JW.UI.Component, {
 	renderComponent: function() {
 		this._super();
 		
+		this._updateFaceText();
+		
 		this.penaltyBoxes[0].el.css("left", "29px");
 		this.penaltyBoxes[1].el.css("left", "344px");
 		
@@ -75,9 +77,23 @@ JW.extend(Table, JW.UI.Component, {
 		if (this.opened) {
 			this.level = Math.min(DATA.answers.length - 1, this.level + 1);
 			this._resetLevel();
+		} else {
+			this._updateFaceText();
 		}
 		this._msTimerStart = new Date().getTime();
 		this._timer = setInterval(this._onTimer, 40);
+	},
+	
+	_updateFaceText: function() {
+		var text;
+		switch (this.level) {
+			case -1: text = "ПРОСТАЯ ИГРА"; break;
+			case  0: text = "ДВОЙНАЯ ИГРА"; break;
+			case  1: text = "ТРОЙНАЯ ИГРА"; break;
+			case  2: text = "ИГРА НАОБОРОТ"; break;
+			case  3: text = "БОЛЬШАЯ ИГРА"; break;
+		}
+		this.getElement("face-text").text(text);
 	},
 	
 	_resetLevel: function() {
@@ -119,6 +135,7 @@ JW.UI.template(Table, {
 	main:
 		'<div jwclass="table">' +
 			'<div jwid="face">' +
+				'<div jwid="face-text" />' +
 				'<div jwid="face-mask" class="table-mask" />' +
 			'</div>' +
 			'<div jwid="back">' +
