@@ -16,8 +16,6 @@
 	position: absolute;
 	left: 117px;
 	top: 15px;
-	width: 188px;
-	height: 208px;
 }
 .answer {
 	position: absolute;
@@ -57,4 +55,18 @@
 }
 .answer-text {
 	white-space: nowrap;
+}
+.penalty-box {
+	position: absolute;
+	top: 123px;
+}
+.penalty-box-cell {
+	position: absolute;
+	left: 0;
+	width: 53px;
+	height: 35px;
+	background: transparent url(images/penalty.png) no-repeat 0 0;
+}
+.penalty-box-cell.active {
+	background-image: url(images/penalty-active.png);
 }

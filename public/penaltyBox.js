@@ -17,7 +17,10 @@ JW.extend(PenaltyBox, JW.UI.Component, {
 		
 		this.cells = new JW.Array();
 		for (var i = 0; i < DATA.maxPenalty; ++i) {
-			this.cells.add(new PenaltyBox.Cell());
+			var cell = new PenaltyBox.Cell();
+			cell.render();
+			cell.el.css("top", (35 * (DATA.maxPenalty - i - 1)) + "px");
+			this.cells.add(cell);
 		}
 		this.addArray(this.cells);
 	},
