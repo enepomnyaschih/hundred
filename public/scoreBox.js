@@ -18,7 +18,7 @@ JW.extend(ScoreBox, JW.UI.Component, {
 		for (var i = 0; i < 3; ++i) {
 			var digit = new ScoreBox.Digit();
 			digit.render();
-			digit.el.css("left", (32 * (2 - i)) + "px");
+			digit.el.css("left", (35 * (2 - i)) + "px");
 			this._digits.add(digit);
 		}
 		this.addArray(this._digits);
@@ -41,10 +41,10 @@ JW.extend(ScoreBox, JW.UI.Component, {
 		this._digits.get(0).setValue(value % 10);
 		
 		value = Math.floor(value / 10);
-		this._digits.get(1).setValue((value % 10) || null);
+		this._digits.get(1).setValue(value ? (value % 10) : null);
 		
 		value = Math.floor(value / 10);
-		this._digits.get(2).setValue((value % 10) || null);
+		this._digits.get(2).setValue(value ? (value % 10) : null);
 	}
 });
 

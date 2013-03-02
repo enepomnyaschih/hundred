@@ -23,25 +23,25 @@ JW.extend(Application, JW.UI.Component, {
 	},
 	
 	renderBank: function() {
-		return this.bank = new ScoreBox();
+		return this.bank = new BankBox(this.scoreData);
 	},
 	
 	renderScore0: function() {
-		return this.scores[0] = new ScoreBox();
+		return this.scores[0] = new TeamScoreBox(this.scoreData, 0);
 	},
 	
 	renderScore1: function() {
-		return this.scores[1] = new ScoreBox();
+		return this.scores[1] = new TeamScoreBox(this.scoreData, 1);
 	},
 	
 	// override
 	renderComponent: function() {
 		this._super();
-		this.bank.el.css("left", "331px");
+		this.bank.el.css("left", "328px");
 		this.bank.el.css("top", "25px");
-		this.scores[0].el.css("left", "17px");
+		this.scores[0].el.css("left", "14px");
 		this.scores[0].el.css("top", "213px");
-		this.scores[1].el.css("left", "645px");
+		this.scores[1].el.css("left", "642px");
 		this.scores[1].el.css("top", "213px");
 		JW.UI.windowEl.bind("keydown", this._onKeyDown);
 	},
