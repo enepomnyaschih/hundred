@@ -14,19 +14,20 @@ JW.extend(Table, JW.UI.Component, {
 	Array<PenaltyBox> penaltyBox;
 	*/
 	
+	renderPenaltyBox0: function() {
+		return this.penaltyBoxes[0] = new PenaltyBox();
+	},
+	
+	renderPenaltyBox1: function() {
+		return this.penaltyBoxes[1] = new PenaltyBox();
+	},
+	
 	// override
 	renderComponent: function() {
 		this._super();
 		
-		this.penaltyBoxes[0] = new PenaltyBox(0);
-		this.penaltyBoxes[0].render();
 		this.penaltyBoxes[0].el.css("left", "29px");
-		this.children.set(this.penaltyBoxes[0], "penalty-box0");
-		
-		this.penaltyBoxes[1] = new PenaltyBox(1);
-		this.penaltyBoxes[1].render();
 		this.penaltyBoxes[1].el.css("left", "344px");
-		this.children.set(this.penaltyBoxes[1], "penalty-box1");
 		
 		this.answers = new JW.Array();
 		for (var i = 0; i < DATA.answerCount; ++i) {

@@ -40,6 +40,7 @@ JW.extend(PenaltyBox, JW.UI.Component, {
 	},
 	
 	reset: function() {
+		this.penalty = 0;
 		this.cells.eachByMethod("setActive", [ false ]);
 	}
 });

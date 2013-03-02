@@ -264,6 +264,8 @@ JW.extend(JW.UI.Component, JW.Class, {
 		this._super();
 	},
 	
+	beforeRender: function() {},
+	
 	renderComponent: function() {},
 	
 	afterAppend: function() {},
@@ -292,13 +294,7 @@ JW.extend(JW.UI.Component, JW.Class, {
 			anchorEl.removeAttr("jwid");
 			anchorEl.addClass(this.getElementClass(jwId));
 		}
-		this._childMapper = new JW.ObservableMap.Mapper({
-			source      : this.children,
-			createItem  : function(child, name) { return new JW.UI.Component.Child(this, child, name); },
-			destroyItem : function(componentChild) { componentChild.destroy(); },
-			scope       : this
-		});
-		this.renderComponent();
+		this.beforeRender();
 		for (var jwId in this._elements) {
 			var anchorEl = this._elements[jwId];
 			var jwIdCamel = JW.String.camel(jwId);
@@ -307,6 +303,13 @@ JW.extend(JW.UI.Component, JW.Class, {
 				this.children.set(this[renderMethodName].call(this), jwId);
 			}
 		}
+		this._childMapper = new JW.ObservableMap.Mapper({
+			source      : this.children,
+			createItem  : function(child, name) { return new JW.UI.Component.Child(this, child, name); },
+			destroyItem : function(componentChild) { componentChild.destroy(); },
+			scope       : this
+		});
+		this.renderComponent();
 	},
 	
 	renderTo: function(el) {
