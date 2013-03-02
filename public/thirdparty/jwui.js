@@ -215,7 +215,6 @@ JW.UI.Component = function(config) {
 	this._allChildren = null;
 	this._childMapper = null;
 	this._arrays = null;
-	this._observableArrays = null;
 },
 
 JW.extend(JW.UI.Component, JW.Class, {
@@ -236,7 +235,6 @@ JW.extend(JW.UI.Component, JW.Class, {
 	Set<JW.UI.Component> _allChildren; // children + (arrays' contents)
 	JW.ObservableMap.Mapper<JW.UI.Component, JW.UI.Component.Child> _childMapper;
 	Set<JW.UI.Component.Array> _arrays;
-	Set<JW.UI.Component.ObservableArray> _observableArrays;
 	*/
 	
 	destroy: function() {
@@ -249,19 +247,15 @@ JW.extend(JW.UI.Component, JW.Class, {
 		this.destroyed = true;
 		if (this.el) {
 			this.el.remove();
+			JW.Set.eachByMethod(this._arrays, "destroy");
+			this._arrays = null;
+			
 			this.destroyComponent();
 			
-			JW.Set.eachByMethod(this._observableArrays, "destroyAll");
-			JW.Set.eachByMethod(this._arrays, "destroyAll");
-			
-			var children = this.children.getValuesArray();
 			this._childMapper.destroy();
-			this.children.destroy();
-			JW.Array.eachByMethod(children, "destroy");
-			
-			this._observableArrays = null;
-			this._arrays = null;
 			this._childMapper = null;
+			this.children.eachByMethod("destroy");
+			this.children.destroy();
 			this.children = null;
 		}
 		this._allChildren = null;
@@ -285,7 +279,6 @@ JW.extend(JW.UI.Component, JW.Class, {
 		this._allChildren = {};
 		this.children = new JW.ObservableMap();
 		this._arrays = {};
-		this._observableArrays = {};
 		this.rootClass = this.rootClass || this.el.attr("jwclass");
 		if (this.rootClass) {
 			this.el.removeAttr("jwclass");
@@ -356,10 +349,6 @@ JW.extend(JW.UI.Component, JW.Class, {
 		return new JW.UI.Component.Array(this, source, this._getElement(el));
 	},
 	
-	addObservableArray: function(source, el) {
-		return new JW.UI.Component.ObservableArray(this, source, this._getElement(el));
-	},
-	
 	_afterAppend: function() {
 		if (this.wasAfterAppend || !this.el) {
 			return;
@@ -428,39 +417,31 @@ JW.extend(JW.UI.Component.EventParams, JW.EventParams, {
 JW.UI.Component.Array = function(parent, source, el) {
 	JW.UI.Component.Array._super.call(this);
 	this.parent = parent;
-	this.source = source;
 	JW.Set.add(parent._arrays, this);
 	
-	for (var i = 0, l = source.length; i < l; ++i) {
-		var component = source[i];
-		parent._initChild(component);
-		el.append(component.el);
-		component._afterAppend();
-	}
+	this._mapper = source.createMapper({
+		createItem  : function(child) { this.parent._initChild(child); return child; },
+		destroyItem : function(child) { this.parent._doneChild(child); },
+		scope       : this
+	});
+	
+	this._inserter = new JW.UI.Inserter(this._mapper.target, el);
 };
 
 JW.extend(JW.UI.Component.Array, JW.Class, {
 	/*
 	Fields
 	JW.UI.Component parent;
-	Array<JW.UI.Component> source;
+	JW.AbstractArray.Mapper<JW.UI.Component, JW.UI.Component> _mapper;
+	JW.AbstractArray.Inserter _inserter;
 	*/
 	
+	// override
 	destroy: function() {
-		var source = this.source;
-		for (var i = 0, l = source.length; i < l; ++i) {
-			var component = source[i];
-			component.el.detach();
-			this.parent._doneChild(component);
-		}
+		this._inserter.destroy();
+		this._mapper.destroy();
 		JW.Set.remove(this.parent._arrays, this);
 		this._super();
-	},
-	
-	destroyAll: function() {
-		var source = this.source;
-		this.destroy();
-		JW.Array.eachByMethod(source, "destroy");
 	}
 });
 
@@ -509,65 +490,6 @@ JW.extend(JW.UI.Component.Child, JW.Class, {
 });
 
 /*
-	jWidget UI source file.
-	
-	Copyright (C) 2013 Egor Nepomnyaschih
-	
-	This program is free software: you can redistribute it and/or modify
-	it under the terms of the GNU Lesser General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
-	
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU Lesser General Public License for more details.
-	
-	You should have received a copy of the GNU Lesser General Public License
-	along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
-JW.UI.Component.ObservableArray = function(parent, source, el) {
-	JW.UI.Component.ObservableArray._super.call(this);
-	this.parent = parent;
-	JW.Set.add(parent._observableArrays, this);
-	
-	this._mapper = new JW.ObservableArray.Mapper({
-		source      : source,
-		createItem  : function(child) { this.parent._initChild(child); return child; },
-		destroyItem : function(child) { this.parent._doneChild(child); },
-		scope       : this
-	});
-	
-	this._inserter = new JW.UI.Inserter({
-		source : this._mapper.target,
-		el     : el
-	});
-};
-
-JW.extend(JW.UI.Component.ObservableArray, JW.Class, {
-	/*
-	Fields
-	JW.UI.Component parent;
-	JW.ObservableArray.Mapper<JW.UI.Component, JW.UI.Component> _mapper;
-	JW.UI.Inserter _inserter;
-	*/
-	
-	destroy: function() {
-		this._inserter.destroy();
-		this._mapper.destroy();
-		JW.Set.remove(this.parent._observableArrays, this);
-		this._super();
-	},
-	
-	destroyAll: function() {
-		var source = this._mapper.source;
-		this.destroy();
-		source.eachByMethod("destroy");
-	}
-});
-
-/*
 	JW ordered collection syncher with UI component.
 	
 	Copyright (C) 2013 Egor Nepomnyaschih
@@ -586,13 +508,10 @@ JW.extend(JW.UI.Component.ObservableArray, JW.Class, {
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-JW.UI.Inserter = function(config) {
+JW.UI.Inserter = function(source, el) {
 	JW.UI.Inserter._super.call(this);
-	this.el = config.el;
-	this.source = config.source;
-	
-	this._inserter = new JW.ObservableArray.Inserter({
-		source     : this.source,
+	this.el = el;
+	this._inserter = source.createInserter({
 		addItem    : this._addItem,
 		removeItem : this._removeItem,
 		clearItems : this._clearItems,
@@ -602,11 +521,8 @@ JW.UI.Inserter = function(config) {
 
 JW.extend(JW.UI.Inserter, JW.Class, {
 	/*
-	Required
-	Element el;
-	JW.ObservableArray<JW.UI.Component> source;
-	
 	Fields
+	Element el;
 	JW.ObservableArray.Inserter<JW.UI.Component> _inserter;
 	*/
 	

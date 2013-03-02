@@ -1,0 +1,60 @@
+.application {
+	position: absolute;
+	width: 750px;
+	height: 410px;
+	background: transparent url(images/application.png) no-repeat 0 0;
+}
+.table {
+	position: absolute;
+	left: 163px;
+	top: 122px;
+	width: 420px;
+	height: 240px;
+	background: transparent url(images/table.png) no-repeat 0 0;
+}
+.table-answers {
+	position: absolute;
+	left: 117px;
+	top: 15px;
+	width: 188px;
+	height: 208px;
+}
+.answer {
+	position: absolute;
+	left: 0;
+	width: 188px;
+	height: 30px;
+}
+.answer-face {
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 188px;
+	height: 30px;
+	background: transparent url(images/answer-face.png) no-repeat 0 0;
+}
+.answer-number {
+	position: absolute;
+	left: 83px;
+	top: 1px;
+	width: 22px;
+	height: 28px;
+	background: transparent none no-repeat 0 0;
+}
+.answer-back {
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 188px;
+	height: 30px;
+	background: transparent url(images/answer-back.png) no-repeat 0 0;
+	color: white;
+	font: 19px impact;
+	padding: 3px 5px;
+}
+.answer-price {
+	float: right;
+}
+.answer-text {
+	white-space: nowrap;
+}
