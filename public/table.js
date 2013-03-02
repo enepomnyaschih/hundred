@@ -73,6 +73,9 @@ JW.extend(Table, JW.UI.Component, {
 		if (this._timer) {
 			return;
 		}
+		if (!this.opened && (this.level >= DATA.answers.length - 1)) {
+			return;
+		}
 		this.opened = !this.opened;
 		if (this.opened) {
 			this.level = Math.min(DATA.answers.length - 1, this.level + 1);
@@ -91,12 +94,16 @@ JW.extend(Table, JW.UI.Component, {
 			case  0: text = "ДВОЙНАЯ ИГРА"; break;
 			case  1: text = "ТРОЙНАЯ ИГРА"; break;
 			case  2: text = "ИГРА НАОБОРОТ"; break;
-			case  3: text = "БОЛЬШАЯ ИГРА"; break;
+			default: text = "БОЛЬШАЯ ИГРА"; break;
 		}
 		this.getElement("face-text").text(text);
 	},
 	
 	_resetLevel: function() {
+		var imageUrl = "images/level-" + Math.min(4, this.level + 1) + ".png";
+		Util.setBackgroundImage(this.getElement("level-box0"), imageUrl);
+		Util.setBackgroundImage(this.getElement("level-box1"), imageUrl);
+		
 		this.answers.every(function(answer, index) {
 			answer.reset(DATA.answers[this.level][index]);
 		}, this);
@@ -140,8 +147,8 @@ JW.UI.template(Table, {
 			'</div>' +
 			'<div jwid="back">' +
 				'<div jwid="answers" />' +
-				'<div jwid="level-box0" />' +
-				'<div jwid="level-box1" />' +
+				'<div jwid="level-box0" class="table-level-box" />' +
+				'<div jwid="level-box1" class="table-level-box" />' +
 				'<div jwid="penalty-box0" />' +
 				'<div jwid="penalty-box1" />' +
 				'<div jwid="back-mask" class="table-mask" />' +

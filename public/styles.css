@@ -52,6 +52,19 @@ html {
 	left: 117px;
 	top: 15px;
 }
+.table-level-box {
+	position: absolute;
+	width: 39px;
+	height: 63px;
+	top: 33px;
+	background: transparent none no-repeat 0 0;
+}
+.table-level-box0 {
+	left: 33px;
+}
+.table-level-box1 {
+	left: 349px;
+}
 .answer {
 	position: absolute;
 	left: 0;
