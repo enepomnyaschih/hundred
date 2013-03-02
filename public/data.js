@@ -2,7 +2,7 @@
 	answerCount  : 6,
 	maxPenalty   : 3,
 	msAnswerOpen : 600,
-	msTableRoll  : 3000,
+	msTableRoll  : 4000,
 	
 	answers : [
 		[
@@ -28,6 +28,14 @@
 			{ text: "Ответ #3.4", price: 6 },
 			{ text: "Ответ #3.5", price: 3 },
 			{ text: "Ответ #3.6", price: 1 }
+		],
+		[
+			{ text: "Ответ #4.1", price: 15 },
+			{ text: "Ответ #4.2", price: 30 },
+			{ text: "Ответ #4.3", price: 60 },
+			{ text: "Ответ #4.4", price: 120 },
+			{ text: "Ответ #4.5", price: 180 },
+			{ text: "Ответ #4.6", price: 240 }
 		]
 	]
 };

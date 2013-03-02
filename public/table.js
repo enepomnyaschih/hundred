@@ -60,7 +60,11 @@ JW.extend(Table, JW.UI.Component, {
 	},
 	
 	openAnswer: function(index) {
-		return this.answers.get(index).open();
+		var price = this.answers.get(index).open();
+		if (this.level < 3) {
+			price *= (this.level + 1);
+		}
+		return price;
 	},
 	
 	roll: function() {
@@ -100,8 +104,8 @@ JW.extend(Table, JW.UI.Component, {
 		var sfactor = JW.smod(factor, 2);
 		var radius = this.el.width() / 2;
 		
-		Util.setTransform(this.getElement("face"), "scaleX(" + Math.cos(Math.PI * sfactor / 2) + ")");
-		Util.setTransform(this.getElement("back"), "scaleX(" + Math.sin(Math.PI * ufactor / 2) + ")");
+		Util.setTransform(this.getElement("face"), "scaleX(" + Math.min(1, 0.005 + Math.cos(Math.PI * sfactor / 2)) + ")");
+		Util.setTransform(this.getElement("back"), "scaleX(" + Math.min(1, 0.005 + Math.sin(Math.PI * ufactor / 2)) + ")");
 		
 		this.getElement("face-mask").css("opacity", .8 * (1 - Math.cos(Math.PI * sfactor / 2)));
 		this.getElement("back-mask").css("opacity", .8 * (1 - Math.sin(Math.PI * ufactor / 2)));
