@@ -2,6 +2,7 @@
 	answerCount  : 6,
 	maxPenalty   : 3,
 	msAnswerOpen : 600,
+	msTableRoll  : 3000,
 	
 	answers : [
 		[

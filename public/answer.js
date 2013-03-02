@@ -25,6 +25,12 @@ JW.extend(Answer, JW.UI.Component, {
 		Util.setBackgroundImage(this.getElement("number"), "images/number-" + (this.index + 1) + ".png");
 	},
 	
+	// override
+	destroyComponent: function() {
+		clearInterval(this._timer);
+		this._super();
+	},
+	
 	reset: function(answerData) {
 		this.opened = false;
 		this._finishAnimation();
