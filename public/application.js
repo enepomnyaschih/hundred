@@ -75,7 +75,14 @@ JW.extend(Application, JW.UI.Component, {
 				this._lastPrice = 0;
 				break;
 			default:
-				this._lastPrice = this.table.openAnswer(event.keyCode - 97);
+				var index = event.keyCode - 97;
+				if ((index < 0) || (index >= 6)) {
+					index = event.keyCode - 49;
+				}
+				if ((index < 0) || (index >= 6)) {
+					break;
+				}
+				this._lastPrice = this.table.openAnswer(index);
 				break;
 		}
 	}
@@ -93,6 +100,7 @@ JW.UI.template(Application, {
 
 Application.reservedKeys = JW.Array.indexBy([
 	97, 98, 99, 100, 101, 102, // Numbers from 1 to 6 (num keyboard)
+	49, 50, 51, 52, 53, 54, // Numbers from 1 to 6 (usual keyboard)
 	107, // num +
 	90,  // z
 	88,  // x
