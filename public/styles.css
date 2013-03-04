@@ -136,3 +136,28 @@ html {
 	height: 46px;
 	background: transparent none no-repeat 0 0;
 }
+.big-table {
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 420px;
+	height: 240px;
+	background-color: black;
+	text-align: center;
+}
+.big-table-column {
+	float: left;
+	width: 210px;
+}
+.big-table-row {
+	margin-top: 20px;
+}
+.big-table  input {
+	border: 0;
+	font: 18px 'Courier New';
+	background-color: black;
+	color: yellow;
+}
+.big-table-price {
+	margin-left: 20px;
+}

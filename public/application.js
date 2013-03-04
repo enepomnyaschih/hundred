@@ -21,7 +21,7 @@ JW.extend(Application, JW.UI.Component, {
 	*/
 	
 	renderRoller: function() {
-		return this.roller = new Roller();
+		return this.roller = new Roller(this.scoreData);
 	},
 	
 	renderBank: function() {
@@ -55,6 +55,9 @@ JW.extend(Application, JW.UI.Component, {
 	},
 	
 	_onKeyDown: function(event) {
+		if (event.target.tagName.toLowerCase() === "input") {
+			return;
+		}
 		if (!Application.reservedKeys[event.keyCode]) {
 			return;
 		}

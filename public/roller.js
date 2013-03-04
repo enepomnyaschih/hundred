@@ -1,8 +1,10 @@
-﻿var Roller = function() {
+﻿var Roller = function(scoreData) {
 	Roller._super.call(this);
 	this.level = -1;
 	this.opened = false;
+	this.scoreData = scoreData;
 	this.table = null;
+	this.bigTable = null;
 	this._msTimerStart = 0;
 	this._timer = 0;
 	this._onTimer = JW.inScope(this._onTimer, this);
@@ -13,7 +15,9 @@ JW.extend(Roller, JW.UI.Component, {
 	Fields
 	Integer level;
 	Boolean opened;
+	ScoreData scoreData;
 	Table table;
+	BigTable bigTable;
 	Integer _msTimerStart;
 	Integer _timer;
 	*/
@@ -39,20 +43,22 @@ JW.extend(Roller, JW.UI.Component, {
 		if (this._timer) {
 			return;
 		}
-		if (!this.opened && (this.level >= DATA.answers.length - 1)) {
+		if (this.bigTable) {
 			return;
 		}
 		this.opened = !this.opened;
 		if (this.opened) {
-			this.level = Math.min(DATA.answers.length - 1, this.level + 1);
+			this.level = Math.min(DATA.answers.length, this.level + 1);
 			if (this.table) {
 				this.children.remove("table").destroy();
 				this.table = null;
 			}
-			if (this.level <= 3) {
+			if (this.level < DATA.answers.length) {
 				this.table = new Table(this.level);
 				this.children.set(this.table, "table");
 			} else {
+				this.bigTable = new BigTable(this.scoreData);
+				this.children.set(this.bigTable, "table");
 			}
 		} else {
 			this._updateFaceText();
