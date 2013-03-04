@@ -1,24 +1,16 @@
-﻿var Table = function(status) {
+﻿var Table = function(level) {
 	Table._super.call(this);
-	this.level = -1;
-	this.opened = false;
-	this.status = status;
+	this.level = level;
 	this.answers = null;
 	this.penaltyBoxes = [];
-	this._msTimerStart = 0;
-	this._timer = 0;
-	this._onTimer = JW.inScope(this._onTimer, this);
 };
 
 JW.extend(Table, JW.UI.Component, {
 	/*
 	Fields
 	Integer level;
-	Boolean opened;
 	Array<Answer> answers;
 	Array<PenaltyBox> penaltyBox;
-	Integer _msTimerStart;
-	Integer _timer;
 	*/
 	
 	renderPenaltyBox0: function() {
@@ -33,26 +25,22 @@ JW.extend(Table, JW.UI.Component, {
 	renderComponent: function() {
 		this._super();
 		
-		this._updateFaceText();
+		var imageUrl = "images/level-" + Math.min(4, this.level + 1) + ".png";
+		Util.setBackgroundImage(this.getElement("level-box0"), imageUrl);
+		Util.setBackgroundImage(this.getElement("level-box1"), imageUrl);
 		
 		this.penaltyBoxes[0].el.css("left", "29px");
 		this.penaltyBoxes[1].el.css("left", "344px");
 		
 		this.answers = new JW.Array();
 		for (var i = 0; i < DATA.answerCount; ++i) {
-			this.answers.add(new Answer(i));
+			this.answers.add(new Answer(i, DATA.answers[this.level][i]));
 		}
 		this.addArray(this.answers, "answers");
 	},
 	
 	// override
-	afterAppend: function() {
-		this._rotate(0);
-	},
-	
-	// override
 	destroyComponent: function() {
-		clearInterval(this._timer);
 		this.answers.eachByMethod("destroy");
 		this._super();
 	},
@@ -67,97 +55,16 @@ JW.extend(Table, JW.UI.Component, {
 			price *= (this.level + 1);
 		}
 		return price;
-	},
-	
-	roll: function() {
-		if (this._timer) {
-			return;
-		}
-		if (!this.opened && (this.level >= DATA.answers.length - 1)) {
-			return;
-		}
-		this.opened = !this.opened;
-		if (this.opened) {
-			this.level = Math.min(DATA.answers.length - 1, this.level + 1);
-			this._resetLevel();
-		} else {
-			this._updateFaceText();
-		}
-		this._msTimerStart = new Date().getTime();
-		this._timer = setInterval(this._onTimer, 40);
-	},
-	
-	_updateFaceText: function() {
-		var text;
-		switch (this.level) {
-			case -1: text = "ПРОСТАЯ ИГРА"; break;
-			case  0: text = "ДВОЙНАЯ ИГРА"; break;
-			case  1: text = "ТРОЙНАЯ ИГРА"; break;
-			case  2: text = "ИГРА НАОБОРОТ"; break;
-			default: text = "БОЛЬШАЯ ИГРА"; break;
-		}
-		this.getElement("face-text").text(text);
-	},
-	
-	_resetLevel: function() {
-		var imageUrl = "images/level-" + Math.min(4, this.level + 1) + ".png";
-		Util.setBackgroundImage(this.getElement("level-box0"), imageUrl);
-		Util.setBackgroundImage(this.getElement("level-box1"), imageUrl);
-		
-		this.answers.every(function(answer, index) {
-			answer.reset(DATA.answers[this.level][index]);
-		}, this);
-		this.penaltyBoxes[0].reset();
-		this.penaltyBoxes[1].reset();
-	},
-	
-	_onTimer: function() {
-		var factor = (new Date().getTime() - this._msTimerStart) / DATA.msTableRoll;
-		if (factor >= 1) {
-			factor = 1;
-			clearInterval(this._timer);
-			this._timer = 0;
-		}
-		this._rotate(factor + (this.opened ? 0 : 1));
-	},
-	
-	// factor from 0 to 2
-	_rotate: function(factor) {
-		var ufactor = JW.mod(factor, 2);
-		var sfactor = JW.smod(factor, 2);
-		var radius = this.el.width() / 2;
-		var xface = -Math.sin(Math.PI * sfactor / 2);
-		var xback = Math.cos(Math.PI * ufactor / 2);
-		
-		Util.setTransform(this.getElement("face"),
-			"skewY(" + (5 * xface) + "deg) " +
-			"scaleX(" + Math.min(1, 0.005 + Math.cos(Math.PI * sfactor / 2)) + ")");
-		Util.setTransform(this.getElement("back"),
-			"skewY(" + (5 * xback) + "deg) " +
-			"scaleX(" + Math.min(1, 0.005 + Math.sin(Math.PI * ufactor / 2)) + ")");
-		
-		this.getElement("face-mask").css("opacity", .8 * (1 - Math.cos(Math.PI * sfactor / 2)));
-		this.getElement("back-mask").css("opacity", .8 * (1 - Math.sin(Math.PI * ufactor / 2)));
-		
-		this.getElement("face").css("left", (radius * xface) + "px");
-		this.getElement("back").css("left", (radius * xback) + "px");
 	}
 });
 
 JW.UI.template(Table, {
 	main:
 		'<div jwclass="table">' +
-			'<div jwid="face">' +
-				'<div jwid="face-text" />' +
-				'<div jwid="face-mask" class="table-mask" />' +
-			'</div>' +
-			'<div jwid="back">' +
-				'<div jwid="answers" />' +
-				'<div jwid="level-box0" class="table-level-box" />' +
-				'<div jwid="level-box1" class="table-level-box" />' +
-				'<div jwid="penalty-box0" />' +
-				'<div jwid="penalty-box1" />' +
-				'<div jwid="back-mask" class="table-mask" />' +
-			'</div>' +
+			'<div jwid="answers" />' +
+			'<div jwid="level-box0" class="table-level-box" />' +
+			'<div jwid="level-box1" class="table-level-box" />' +
+			'<div jwid="penalty-box0" />' +
+			'<div jwid="penalty-box1" />' +
 		'</div>'
 });

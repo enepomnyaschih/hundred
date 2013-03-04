@@ -1,8 +1,8 @@
-﻿var Answer = function(index) {
+﻿var Answer = function(index, answerData) {
 	Answer._super.call(this);
 	this.index = index;
 	this.opened = false;
-	this.answerData = null;
+	this.answerData = answerData;
 	this._msOpenStart = 0;
 	this._timer = 0;
 	this._onTimer = JW.inScope(this._onTimer, this);
@@ -23,6 +23,7 @@ JW.extend(Answer, JW.UI.Component, {
 		this._super();
 		this.el.css("top", (36 * this.index) + "px");
 		Util.setBackgroundImage(this.getElement("number"), "images/number-" + (this.index + 1) + ".png");
+		this.reset(this.answerData);
 	},
 	
 	// override

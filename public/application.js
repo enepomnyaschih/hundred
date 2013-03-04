@@ -1,7 +1,7 @@
 ﻿var Application = function() {
 	Application._super.call(this);
 	this.scoreData = new ScoreData();
-	this.table = null;
+	this.roller = null;
 	this.bank = null;
 	this.scores = [];
 	this._lastKeyCode = null;
@@ -13,15 +13,15 @@ JW.extend(Application, JW.UI.Component, {
 	/*
 	Fields
 	ScoreData scoreData;
-	Table table;
+	Roller roller;
 	BankBox bank;
 	Array<ScoreBox> scores;
 	Integer _lastKeyCode;
 	Integer _lastPrice;
 	*/
 	
-	renderTable: function() {
-		return this.table = new Table();
+	renderRoller: function() {
+		return this.roller = new Roller();
 	},
 	
 	renderBank: function() {
@@ -65,17 +65,20 @@ JW.extend(Application, JW.UI.Component, {
 		}
 		this._lastKeyCode = null;
 		switch (event.keyCode) {
-			case 90: this.table.addPenalty(0); break;
-			case 88: this.table.addPenalty(1); break;
+			case 90: if (this.roller.table) this.roller.table.addPenalty(0); break;
+			case 88: if (this.roller.table) this.roller.table.addPenalty(1); break;
 			case 188: this.scoreData.pullBank(0); break;
 			case 190: this.scoreData.pullBank(1); break;
-			case 32: this.table.roll(); break;
+			case 32: this.roller.roll(); break;
 			case 187:
 			case 107:
 				this.scoreData.increaseBank(this._lastPrice);
 				this._lastPrice = 0;
 				break;
 			default:
+				if (!this.roller.table) {
+					break;
+				}
 				var index = event.keyCode - 97;
 				if ((index < 0) || (index >= 6)) {
 					index = event.keyCode - 49;
@@ -83,7 +86,7 @@ JW.extend(Application, JW.UI.Component, {
 				if ((index < 0) || (index >= 6)) {
 					break;
 				}
-				this._lastPrice = this.table.openAnswer(index);
+				this._lastPrice = this.roller.table.openAnswer(index);
 				break;
 		}
 	}
@@ -92,7 +95,7 @@ JW.extend(Application, JW.UI.Component, {
 JW.UI.template(Application, {
 	main:
 		'<div jwclass="application">' +
-			'<div jwid="table" />' +
+			'<div jwid="roller" />' +
 			'<div jwid="bank" />' +
 			'<div jwid="score0" />' +
 			'<div jwid="score1" />' +
