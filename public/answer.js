@@ -38,6 +38,7 @@ JW.extend(Answer, JW.UI.Component, {
 		this.answerData = answerData;
 		this.getElement("price").empty();
 		this.getElement("text").empty();
+		this.getElement("text").css("font-size", "");
 	},
 	
 	open: function() {
@@ -47,6 +48,7 @@ JW.extend(Answer, JW.UI.Component, {
 		this.opened = true;
 		this.getElement("price").text(this.answerData.price);
 		this.getElement("text").text(this.answerData.text);
+		this.getElement("text").css("font-size", this.answerData.size ? (this.answerData.size + "px") : "");
 		this._msOpenStart = new Date().getTime();
 		this._timer = setInterval(this._onTimer, 40);
 		trackAnswer.play();

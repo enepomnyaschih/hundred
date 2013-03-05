@@ -6,36 +6,36 @@
 	
 	answers : [
 		[
-			{ text: "Ответ #1.1", price: 40 },
-			{ text: "Ответ #1.2", price: 30 },
-			{ text: "Ответ #1.3", price: 20 },
-			{ text: "Ответ #1.4", price: 6 },
-			{ text: "Ответ #1.5", price: 3 },
-			{ text: "Ответ #1.6", price: 1 }
+			{ text: "РАБОТАТЬ", price: 44 },
+			{ text: "ИГРАТЬ", price: 20 },
+			{ text: "ПИТЬ ПИВО", price: 13 },
+			{ text: "В ИНТЕРНЕТ", price: 10 },
+			{ text: "ДОМОЙ", price: 8 },
+			{ text: "СПАТЬ", price: 5 }
 		],
 		[
-			{ text: "Ответ #2.1", price: 40 },
-			{ text: "Ответ #2.2", price: 30 },
-			{ text: "Ответ #2.3", price: 20 },
-			{ text: "Ответ #2.4", price: 6 },
-			{ text: "Ответ #2.5", price: 3 },
-			{ text: "Ответ #2.6", price: 1 }
+			{ text: "БРЕЕТ", price: 37 },
+			{ text: "НЕ РАСТЕТ", price: 28 },
+			{ text: "ПЛОХО РАБОТАЕТ", price: 17 },
+			{ text: "БОРОДА ПОЛНИТ", price: 13 },
+			{ text: "ПРЯЧЕТ", price: 4 },
+			{ text: "", price: 1 }
 		],
 		[
-			{ text: "Ответ #3.1", price: 40 },
-			{ text: "Ответ #3.2", price: 30 },
-			{ text: "Ответ #3.3", price: 20 },
-			{ text: "Ответ #3.4", price: 6 },
-			{ text: "Ответ #3.5", price: 3 },
-			{ text: "Ответ #3.6", price: 1 }
+			{ text: "ТРЕНИНГ/МИТИНГ", price: 35 },
+			{ text: "ДОМОЙ", price: 25 },
+			{ text: "ЕСТЬ", price: 19 },
+			{ text: "ДОСТАВАТЬ", price: 13 },
+			{ text: "УПРАВЛЯТЬ", price: 7 },
+			{ text: "", price: 1 }
 		],
 		[
-			{ text: "Ответ #4.1", price: 15 },
-			{ text: "Ответ #4.2", price: 30 },
-			{ text: "Ответ #4.3", price: 60 },
-			{ text: "Ответ #4.4", price: 120 },
-			{ text: "Ответ #4.5", price: 180 },
-			{ text: "Ответ #4.6", price: 240 }
+			{ text: "НЕ ПОЛИВАЮТ", price: 15 },
+			{ text: "НЕТ ДЕВУШЕК", price: 30 },
+			{ text: "РАДИАЦИЯ", price: 60 },
+			{ text: "ХОЛОДНО", price: 120 },
+			{ text: "ИЗ-ЗА ПРОГРАММИСТОВ", price: 180, size: 14 },
+			{ text: "ПОЛИВАЮТ ЧАЕМ", price: 240 }
 		]
 	]
 };
