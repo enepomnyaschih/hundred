@@ -30,6 +30,9 @@
 	"images/table-back.png"
 ];
 
+var trackAnswer = new JW.Audio.Track({ mp3: "sound/answer.mp3" });
+var trackPenalty = new JW.Audio.Track({ mp3: "sound/penalty.mp3" });
+
 var application;
 
 jQuery(function() {

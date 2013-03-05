@@ -37,6 +37,7 @@ JW.extend(PenaltyBox, JW.UI.Component, {
 		}
 		this.cells.get(this.penalty).setActive(true);
 		++this.penalty;
+		trackPenalty.play();
 	},
 	
 	reset: function() {

@@ -49,6 +49,7 @@ JW.extend(Answer, JW.UI.Component, {
 		this.getElement("text").text(this.answerData.text);
 		this._msOpenStart = new Date().getTime();
 		this._timer = setInterval(this._onTimer, 40);
+		trackAnswer.play();
 		return this.answerData.price;
 	},
 	
