@@ -51,7 +51,7 @@ JW.UI.template(BigTable, {
 	column : '<div class="big-table-column" />',
 	row:
 		'<div class="big-table-row">' +
-			'<input type="text" class="big-table-answer" value="░░░░░░░░░░░░" size="12" />' +
-			'<input type="text" class="big-table-price" value="░░" size="2" />' +
+			'<input type="text" class="big-table-answer" value="░░░░░░░░░░░░" size="12" maxlength="12" />' +
+			'<input type="text" class="big-table-price" value="░░" size="2" maxlength="2" />' +
 		'</div>'
 });

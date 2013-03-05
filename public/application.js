@@ -73,6 +73,7 @@ JW.extend(Application, JW.UI.Component, {
 			case 188: this.scoreData.pullBank(0); break;
 			case 190: this.scoreData.pullBank(1); break;
 			case 32: this.roller.roll(); break;
+			case 220: trackPenalty.play(); break;
 			case 187:
 			case 107:
 				this.scoreData.increaseBank(this._lastPrice);
@@ -114,5 +115,6 @@ Application.reservedKeys = JW.Array.indexBy([
 	88,  // x
 	188, // <
 	190, // >
-	32   // space
+	32,  // space
+	220  // \
 ]);
