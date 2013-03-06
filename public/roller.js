@@ -5,6 +5,7 @@
 	this.scoreData = scoreData;
 	this.table = null;
 	this.bigTable = null;
+	this.bigTableReplica = null;
 	this._msTimerStart = 0;
 	this._timer = 0;
 	this._onTimer = JW.inScope(this._onTimer, this);
@@ -18,6 +19,7 @@ JW.extend(Roller, JW.UI.Component, {
 	ScoreData scoreData;
 	Table table;
 	BigTable bigTable;
+	BigTable bigTableReplica;
 	Integer _msTimerStart;
 	Integer _timer;
 	*/
@@ -43,7 +45,16 @@ JW.extend(Roller, JW.UI.Component, {
 		if (this._timer) {
 			return;
 		}
+		if (this.bigTableReplica) {
+			this.children.set(this.bigTable, "table");
+			this.bigTable._updateBank();
+			this.bigTableReplica.destroy();
+			this.bigTableReplica = null;
+			return;
+		}
 		if (this.bigTable) {
+			this.bigTableReplica = new BigTable(this.scoreData);
+			this.children.set(this.bigTableReplica, "table");
 			return;
 		}
 		this.opened = !this.opened;
@@ -53,15 +64,18 @@ JW.extend(Roller, JW.UI.Component, {
 				this.children.remove("table").destroy();
 				this.table = null;
 			}
+			trackLevel[this.level].play();
 			if (this.level < DATA.answers.length) {
 				this.table = new Table(this.level);
 				this.children.set(this.table, "table");
 			} else {
+				this.getElement("table").removeClass("table");
 				this.bigTable = new BigTable(this.scoreData);
 				this.children.set(this.bigTable, "table");
 			}
 		} else {
 			this._updateFaceText();
+			trackNextLevel.play();
 		}
 		this._msTimerStart = new Date().getTime();
 		this._timer = setInterval(this._onTimer, 40);

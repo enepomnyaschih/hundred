@@ -2,12 +2,28 @@ html {
 	background-color: black;
 	overflow: hidden;
 }
+.ux-timer-view {
+	background-color: black;
+	color: yellow;
+	float: left;
+	font-family: monospace;
+	font-size: 12pt;
+	font-weight: bold;
+	margin-bottom: 5px;
+	padding: 2px 5px 0;
+}
+
 .application {
 	position: relative;
 	margin: auto;
 	width: 760px;
 	height: 410px;
 	background: transparent url(images/application.png) no-repeat 0 0;
+}
+.application-timer {
+	position: absolute;
+	top: 420px;
+	left: 350px;
 }
 .roller {
 	position: absolute;
@@ -158,6 +174,9 @@ html {
 	font: 18px 'Courier New';
 	background-color: black;
 	color: yellow;
+}
+.big-table-answer {
+	text-align: right;
 }
 .big-table-price {
 	margin-left: 20px;

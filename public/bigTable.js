@@ -16,6 +16,7 @@ JW.extend(BigTable, JW.UI.Component, {
 		for (var i = 0; i < 2; ++i) {
 			this.el.append(this._renderColumn());
 		}
+		this._updateBank();
 	},
 	
 	_renderColumn: function() {
