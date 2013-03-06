@@ -18,16 +18,16 @@
 			{ text: "НЕ РАСТЕТ", price: 28 },
 			{ text: "ПЛОХО РАБОТАЕТ", price: 17 },
 			{ text: "БОРОДА ПОЛНИТ", price: 13 },
-			{ text: "ПРЯЧЕТ", price: 4 },
-			{ text: "", price: 1 }
+			{ text: "НЕ МУЖЧИНА", price: 4 },
+			{ text: "ПРЯЧЕТ", price: 1 }
 		],
 		[
-			{ text: "ТРЕНИНГ/МИТИНГ", price: 35 },
+			{ text: "МИТИНГ", price: 35 },
 			{ text: "ДОМОЙ", price: 25 },
-			{ text: "ЕСТЬ", price: 19 },
+			{ text: "КУШАТЬ", price: 19 },
 			{ text: "ДОСТАВАТЬ", price: 13 },
 			{ text: "УПРАВЛЯТЬ", price: 7 },
-			{ text: "", price: 1 }
+			{ text: "ТРЕНИНГ", price: 1 }
 		],
 		[
 			{ text: "НЕ ПОЛИВАЮТ", price: 15 },
