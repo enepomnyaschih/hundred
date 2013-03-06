@@ -45,16 +45,7 @@ JW.extend(Roller, JW.UI.Component, {
 		if (this._timer) {
 			return;
 		}
-		if (this.bigTableReplica) {
-			this.children.set(this.bigTable, "table");
-			this.bigTable._updateBank();
-			this.bigTableReplica.destroy();
-			this.bigTableReplica = null;
-			return;
-		}
-		if (this.bigTable) {
-			this.bigTableReplica = new BigTable(this.scoreData);
-			this.children.set(this.bigTableReplica, "table");
+		if (!this.opened && (this.level === DATA.answers.length)) {
 			return;
 		}
 		this.opened = !this.opened;
@@ -75,10 +66,27 @@ JW.extend(Roller, JW.UI.Component, {
 			}
 		} else {
 			this._updateFaceText();
-			trackNextLevel.play();
+			if (this.level < DATA.answers.length) {
+				trackNextLevel.play();
+			}
 		}
 		this._msTimerStart = new Date().getTime();
 		this._timer = setInterval(this._onTimer, 40);
+	},
+	
+	toggleBig: function() {
+		if (this.bigTableReplica) {
+			this.children.set(this.bigTable, "table");
+			this.bigTable._updateBank();
+			this.bigTableReplica.destroy();
+			this.bigTableReplica = null;
+			return;
+		}
+		if (this.bigTable) {
+			this.bigTableReplica = new BigTable(this.scoreData);
+			this.children.set(this.bigTableReplica, "table");
+			return;
+		}
 	},
 	
 	_updateFaceText: function() {
@@ -88,7 +96,8 @@ JW.extend(Roller, JW.UI.Component, {
 			case  0: text = "ДВОЙНАЯ ИГРА"; break;
 			case  1: text = "ТРОЙНАЯ ИГРА"; break;
 			case  2: text = "ИГРА НАОБОРОТ"; break;
-			default: text = "БОЛЬШАЯ ИГРА"; break;
+			case  3: text = "БОЛЬШАЯ ИГРА"; break;
+			default: text = "ПОЗДРАВЛЯЕМ!"; break;
 		}
 		this.getElement("face-text").text(text);
 	},

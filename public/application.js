@@ -80,6 +80,7 @@ JW.extend(Application, JW.UI.Component, {
 			case 188: this.scoreData.pullBank(0); trackScores.play(); break;
 			case 190: this.scoreData.pullBank(1); trackScores.play(); break;
 			case 32: this.roller.roll(); break;
+			case 81: this.roller.toggleBig(); break;
 			case 220: trackRepeat.play(); break;
 			case 65: this._toggleTimer(25000); break;
 			case 83: this._toggleTimer(30000); break;
@@ -162,8 +163,9 @@ Application.reservedKeys = JW.Array.indexBy([
 	67,  // c - penalty free
 	188, // < - bank to left
 	190, // > - bank to right
-	32,  // space - next level, show/hide big table
+	32,  // space - next level
 	220, // \ - big game answer repeat
 	65,  // a - show 25 seconds timer
-	83   // s - show 30 seconds timer
+	83,  // s - show 30 seconds timer
+	81   // q - show/hide big table
 ]);

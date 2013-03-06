@@ -1,0 +1,11 @@
+Numbers from 1 to 6 - open answer
++ - add to bank
+z - penalty left
+x - penalty right
+c - penalty free
+< - bank to left
+> - bank to right
+space - next level, show/hide big table
+\ - big game answer repeat
+a - show/hide 25 seconds timer
+s - show/hide 30 seconds timer
