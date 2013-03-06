@@ -32,6 +32,7 @@
 
 var trackAnswer = new JW.Audio.Track({ mp3: "sound/answer.mp3" });
 var trackPenalty = new JW.Audio.Track({ mp3: "sound/penalty.mp3" });
+var trackRepeat = new JW.Audio.Track({ mp3: "sound/repeat.mp3" });
 
 var application;
 
