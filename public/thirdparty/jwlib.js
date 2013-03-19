@@ -743,6 +743,8 @@ JW.Alg.SimpleMethods = {
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+// TODO: make merge to take JW.AbstractCollection as argument
+
 JW.Alg.createBuildFunctions = function(every, createEmpty, pushItem) {
 	var namespace = JW.Alg.createSimpleFunctions(every);
 	
@@ -811,6 +813,706 @@ JW.Alg.BuildMethods = JW.apply({}, JW.Alg.SimpleMethods, {
 });
 
 /*
+	jWidget Lib source file.
+	
+	Copyright (C) 2013 Egor Nepomnyaschih
+	
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU Lesser General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+	
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU Lesser General Public License for more details.
+	
+	You should have received a copy of the GNU Lesser General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+JW.AbstractArray = {};
+
+/*
+	jWidget Lib source file.
+	
+	Copyright (C) 2013 Egor Nepomnyaschih
+	
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU Lesser General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+	
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU Lesser General Public License for more details.
+	
+	You should have received a copy of the GNU Lesser General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+JW.AbstractArray.Indexer = function(source, config) {
+	JW.AbstractArray.Indexer._super.call(this);
+	config = config || {};
+	this.source = source;
+	this.getKey = config.getKey;
+	this._targetCreated = !config.target;
+	this.target = config.target || this.source.createEmptyMap();
+	this.scope = config.scope;
+	this.target.setAll(this._index(this.source.getItems()));
+};
+
+JW.extend(JW.AbstractArray.Indexer/*<T extends Any>*/, JW.Class, {
+	/*
+	Required
+	JW.AbstractArray<T> source;
+	String getKey(T item);
+	
+	Optional
+	JW.AbstractMap<T> target;
+	Object scope;
+	
+	Fields
+	Boolean _targetCreated;
+	*/
+	
+	destroy: function() {
+		this.target.removeAll(this._keys(this.source.getItems()));
+		if (this._targetCreated) {
+			this.target.destroy();
+		}
+		this._super();
+	},
+	
+	_index: function(items) {
+		return JW.Array.index(items, this.getKey, this.scope || this);
+	},
+	
+	_keys: function(items) {
+		return JW.Array.map(items, this.getKey, this.scope || this);
+	}
+});
+
+/*
+	jWidget Lib source file.
+	
+	Copyright (C) 2013 Egor Nepomnyaschih
+	
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU Lesser General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+	
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU Lesser General Public License for more details.
+	
+	You should have received a copy of the GNU Lesser General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+JW.AbstractArray.Inserter = function(source, config) {
+	JW.AbstractArray.Inserter._super.call(this);
+	config = config || {};
+	this.source = source;
+	this.addItem = config.addItem;
+	this.removeItem = config.removeItem;
+	this.scope = config.scope;
+	this.clearItems = config.clearItems;
+	this._fill();
+};
+
+JW.extend(JW.AbstractArray.Inserter/*<T extends Any>*/, JW.Class, {
+	/*
+	Required
+	JW.AbstractArray<T> source;
+	void addItem(T item, Integer index);
+	void removeItem(Integer index, T item);
+	
+	Optional
+	Object scope; // defaults to this
+	void clearItems(Array<T> items);
+	*/
+	
+	destroy: function() {
+		this._clear(this.source.getItems());
+		this._super();
+	},
+	
+	_addItem: function(item, index) {
+		this.addItem.call(this.scope || this, item, index);
+	},
+	
+	_addItems: function(items, index) {
+		for (var i = 0; i < items.length; ++i) {
+			this._addItem(items[i], i + index);
+		}
+	},
+	
+	_removeItem: function(item, index) {
+		this.removeItem.call(this.scope || this, index, item);
+	},
+	
+	_removeItems: function(items, index) {
+		for (var i = items.length - 1; i >= 0; --i) {
+			this._removeItem(items[i], i + index);
+		}
+	},
+	
+	_fill: function() {
+		this._addItems(this.source.getItems().concat(), 0);
+	},
+	
+	_clear: function(items) {
+		if (items.length === 0) {
+			return;
+		}
+		if (this.clearItems) {
+			this.clearItems.call(this.scope || this, items);
+		} else {
+			this._removeItems(items, 0);
+		}
+	}
+});
+
+/*
+	jWidget Lib source file.
+	
+	Copyright (C) 2013 Egor Nepomnyaschih
+	
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU Lesser General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+	
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU Lesser General Public License for more details.
+	
+	You should have received a copy of the GNU Lesser General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+JW.AbstractArray.Lister = function(source, config) {
+	JW.AbstractArray.Lister._super.call(this);
+	config = config || {};
+	this.source = source;
+	this._targetCreated = !config.target;
+	this.target = config.target || this.source.createEmptySet();
+	this.target.addAll(this.source.getItems());
+};
+
+JW.extend(JW.AbstractArray.Lister/*<T extends JW.Class>*/, JW.Class, {
+	/*
+	Required
+	JW.AbstractArray<T> source;
+	
+	Optional
+	JW.Set<T> target;
+	
+	Fields
+	Boolean _targetCreated;
+	*/
+	
+	destroy: function() {
+		this.target.removeAll(this.source.getItems());
+		if (this._targetCreated) {
+			this.target.destroy();
+		}
+		this._super();
+	}
+});
+
+/*
+	jWidget Lib source file.
+	
+	Copyright (C) 2013 Egor Nepomnyaschih
+	
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU Lesser General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+	
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU Lesser General Public License for more details.
+	
+	You should have received a copy of the GNU Lesser General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+JW.AbstractArray.Mapper = function(source, config) {
+	JW.AbstractArray.Mapper._super.call(this);
+	config = config || {};
+	this.source = source;
+	this.createItem = config.createItem;
+	this.destroyItem = config.destroyItem;
+	this._targetCreated = !config.target;
+	this.target = config.target || this.source.createEmpty();
+	this.scope = config.scope;
+	this.target.addAll(this._fill());
+};
+
+JW.extend(JW.AbstractArray.Mapper/*<S extends Any, T extends Any>*/, JW.Class, {
+	/*
+	Required
+	JW.AbstractArray<S> source;
+	T createItem(S data);
+	void destroyItem(T item, S data);
+	
+	Optional
+	JW.AbstractArray<T> target;
+	Object scope; // defaults to this
+	
+	Fields
+	Boolean _targetCreated;
+	*/
+	
+	destroy: function() {
+		this._clear(this.source.getItems());
+		if (this._targetCreated) {
+			this.target.destroy();
+		}
+		this._super();
+	},
+	
+	_clear: function(datas) {
+		var items = this.target.clear();
+		for (var i = items.length - 1; i >= 0; --i) {
+			this.destroyItem.call(this.scope || this, items[i], datas[i]);
+		}
+	},
+	
+	_fill: function() {
+		return JW.Array.map(this.source.getItems(), this.createItem, this.scope || this);
+	}
+});
+
+/*
+	jWidget Lib source file.
+	
+	Copyright (C) 2013 Egor Nepomnyaschih
+	
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU Lesser General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+	
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU Lesser General Public License for more details.
+	
+	You should have received a copy of the GNU Lesser General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+JW.AbstractArray.Splitter = function(source, config) {
+	JW.AbstractArray.Splitter._super.call(this);
+	config = config || {};
+	this.source = source;
+	this._rowsCreated = !config.rows;
+	this.rows = config.rows || this.source.createEmpty();
+	this.capacity = config.capacity || 1;
+	this._length = 0;
+	
+	this._inserter = this.source.createInserter({
+		addItem    : this._addItem,
+		removeItem : this._removeItem,
+		clearItems : this._clearItems,
+		scope      : this
+	});
+};
+
+JW.extend(JW.AbstractArray.Splitter/*<T extends Any, R extends JW.AbstractArray<T>>*/, JW.Class, {
+	/*
+	Required
+	JW.AbstractArray<T> source;
+	
+	Optional
+	JW.AbstractArray<R> rows;
+	Integer capacity;
+	
+	Fields
+	Boolean _rowsCreated;
+	Integer _length;
+	JW.AbstractArray.Inserter<T> _inserter;
+	*/
+	
+	destroy: function() {
+		this._inserter.destroy();
+		if (this._rowsCreated) {
+			this.rows.destroy();
+		}
+		this._super();
+	},
+	
+	createRow: function() {
+		return this.source.createEmpty();
+	},
+	
+	destroyRow: function(row) {
+		row.destroy();
+	},
+	
+	_addItem: function(item, index) {
+		if (this._length % this.capacity === 0) {
+			this.rows.add(this.createRow.call(this.scope || this));
+		}
+		var firstRow = Math.floor(index / this.capacity);
+		for (var i = this.rows.getLength() - 1; i > firstRow; --i) {
+			var broughtItem = this.rows.get(i - 1).remove(this.capacity - 1);
+			this.rows.get(i).add(broughtItem, 0);
+		}
+		this.rows.get(firstRow).add(item, index % this.capacity);
+		++this._length;
+	},
+	
+	_removeItem: function(index) {
+		var firstRow = Math.floor(index / this.capacity);
+		this.rows.get(firstRow).remove(index % this.capacity);
+		for (var i = firstRow + 1; i < this.rows.getLength(); ++i) {
+			var broughtItem = this.rows.get(i).remove(0);
+			this.rows.get(i - 1).add(broughtItem, this.capacity - 1);
+		}
+		--this._length;
+		if (this._length % this.capacity === 0) {
+			this.destroyRow.call(this.scope || this, this.rows.remove(this.rows.getLength() - 1));
+		}
+	},
+	
+	_clearItems: function() {
+		var rows = this.rows.clear();
+		this._length = 0;
+		JW.Array.each(rows, this.destroyRow, this.scope || this);
+	}
+});
+
+/*
+	jWidget Lib source file.
+	
+	Copyright (C) 2013 Egor Nepomnyaschih
+	
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU Lesser General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+	
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU Lesser General Public License for more details.
+	
+	You should have received a copy of the GNU Lesser General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+JW.AbstractMap = {};
+
+/*
+	jWidget Lib source file.
+	
+	Copyright (C) 2013 Egor Nepomnyaschih
+	
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU Lesser General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+	
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU Lesser General Public License for more details.
+	
+	You should have received a copy of the GNU Lesser General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+JW.AbstractMap.Lister = function(source, config) {
+	JW.AbstractMap.Lister._super.call(this);
+	config = config || {};
+	this.source = source;
+	this._targetCreated = !config.target;
+	this.target = config.target || source.createEmptySet();
+	this.target.addAll(this.source.getValuesArray());
+};
+
+JW.extend(JW.AbstractMap.Lister/*<T extends JW.Class>*/, JW.Class, {
+	/*
+	Required
+	JW.AbstractMap<T> source;
+	
+	Optional
+	JW.AbstractSet<T> target;
+	
+	Fields
+	Boolean _targetCreated;
+	*/
+	
+	destroy: function() {
+		this.target.clear();
+		if (this._targetCreated) {
+			this.target.destroy();
+		}
+		this._super();
+	}
+});
+
+/*
+	jWidget Lib source file.
+	
+	Copyright (C) 2013 Egor Nepomnyaschih
+	
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU Lesser General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+	
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU Lesser General Public License for more details.
+	
+	You should have received a copy of the GNU Lesser General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+JW.AbstractMap.Mapper = function(source, config) {
+	JW.AbstractMap.Mapper._super.call(this);
+	config = config || {};
+	this.source = source;
+	this.createItem = config.createItem;
+	this.destroyItem = config.destroyItem;
+	this._targetCreated = !config.target;
+	this.target = config.target || source.createEmpty();
+	this.scope = config.scope;
+	this._destructionQueue = [];
+	this.target.setAll(JW.Map.map(this.source.map.json, this.createItem, this.scope || this));
+};
+
+JW.extend(JW.AbstractMap.Mapper/*<S extends Any, T extends Any>*/, JW.Class, {
+	/*
+	Required
+	JW.AbstractMap<S> source;
+	T createItem(S data, String key);
+	void destroyItem(T item, S data, String key);
+	
+	Optional
+	JW.AbstractMap<T> target;
+	Object scope; // defaults to this
+	
+	Fields
+	Boolean _targetCreated;
+	Array<Array> _destructionQueue;
+	*/
+	
+	destroy: function() {
+		if (!this.source.isEmpty()) {
+			this.source.every(this._remove, this);
+			this._change();
+		}
+		if (this._targetCreated) {
+			this.target.destroy();
+		}
+		this._super();
+	},
+	
+	_remove: function(data, key) {
+		this._destructionQueue.push([ this.target._remove(key), data, key ]);
+	},
+	
+	_change: function() {
+		for (var i = 0; i < this._destructionQueue.length; ++i) {
+			var params = this._destructionQueue[i];
+			this.destroyItem.call(this.scope || this, params[0], params[1], params[2]);
+		}
+		this._destructionQueue = [];
+	}
+});
+
+/*
+	jWidget Lib source file.
+	
+	Copyright (C) 2013 Egor Nepomnyaschih
+	
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU Lesser General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+	
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU Lesser General Public License for more details.
+	
+	You should have received a copy of the GNU Lesser General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+JW.AbstractSet = {};
+
+/*
+	jWidget Lib source file.
+	
+	Copyright (C) 2013 Egor Nepomnyaschih
+	
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU Lesser General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+	
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU Lesser General Public License for more details.
+	
+	You should have received a copy of the GNU Lesser General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+// TODO: Introduce addAll, setAll, removeAll to fix "change" event hacks
+
+JW.AbstractSet.Indexer = function(source, config) {
+	JW.AbstractSet.Indexer._super.call(this);
+	config = config || {};
+	this.source = source;
+	this.getKey = config.getKey;
+	this._targetCreated = !config.target;
+	this.target = config.target || source.createEmptyMap();
+	this.scope = config.scope;
+	if (!this.source.isEmpty()) {
+		this.source.every(this._add, this);
+		this._change();
+	}
+};
+
+JW.extend(JW.AbstractSet.Indexer/*<T extends JW.Class>*/, JW.Class, {
+	/*
+	Required
+	JW.AbstractSet<T> source;
+	String getKey(T item);
+	
+	Optional
+	JW.AbstractMap<T> target;
+	Object scope;
+	
+	Fields
+	Boolean _targetCreated;
+	*/
+	
+	destroy: function() {
+		if (!this.source.isEmpty()) {
+			this.source.every(this._remove, this);
+			this._change();
+		}
+		if (this._targetCreated) {
+			this.target.destroy();
+		}
+		this._super();
+	},
+	
+	_add: function(item) {
+		this.target._set(item, this.getKey.call(this.scope || this, item));
+	},
+	
+	_remove: function(item) {
+		this.target._remove(this.getKey.call(this.scope || this, item));
+	},
+	
+	_change: function() {}
+});
+
+/*
+	jWidget Lib source file.
+	
+	Copyright (C) 2013 Egor Nepomnyaschih
+	
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU Lesser General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+	
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU Lesser General Public License for more details.
+	
+	You should have received a copy of the GNU Lesser General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+JW.AbstractSet.Mapper = function(source, config) {
+	JW.AbstractSet.Mapper._super.call(this);
+	config = config || {};
+	this.source = source;
+	this.createItem = config.createItem;
+	this.destroyItem = config.destroyItem;
+	this._targetCreated = !config.target;
+	this.target = config.target || source.createEmpty();
+	this.scope = config.scope;
+	this._items = {};
+	this._destructionQueue = [];
+	if (!this.source.isEmpty()) {
+		this.source.every(this._add, this);
+		this._change();
+	}
+};
+
+JW.extend(JW.AbstractSet.Mapper/*<S extends JW.Class, T extends JW.Class>*/, JW.Class, {
+	/*
+	Required
+	JW.AbstractSet<S> source;
+	T createItem(S data);
+	void destroyItem(T item, S data);
+	
+	Optional
+	JW.AbstractSet<T> target;
+	Object scope; // defaults to this
+	
+	Fields
+	Boolean _targetCreated;
+	Map<T> _items;
+	Array<Array> _destructionQueue;
+	*/
+	
+	destroy: function() {
+		if (!this.source.isEmpty()) {
+			this.source.every(this._remove, this);
+			this._change();
+		}
+		if (this._targetCreated) {
+			this.target.destroy();
+		}
+		this._super();
+	},
+	
+	_add: function(data) {
+		var item = this.createItem.call(this.scope || this, data);
+		this.target._add(item);
+		this._items[data._iid] = item;
+	},
+	
+	_remove: function(data) {
+		var item = this._items[data._iid];
+		delete this._items[data._iid];
+		this.target._remove(item);
+		this._destructionQueue.push([ item, data ]);
+	},
+	
+	_change: function() {
+		for (var i = 0; i < this._destructionQueue.length; ++i) {
+			var params = this._destructionQueue[i];
+			this.destroyItem.call(this.scope || this, params[0], params[1]);
+		}
+		this._destructionQueue = [];
+	}
+});
+
+/*
 	JW array extension.
 	
 	Copyright (C) 2013 Egor Nepomnyaschih
@@ -828,6 +1530,8 @@ JW.Alg.BuildMethods = JW.apply({}, JW.Alg.SimpleMethods, {
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+
+// TODO: structurize and document removeItem, removeBy and other misc array methods
 
 JW.Array = function(items) {
 	JW.Array._super.call(this);
@@ -868,6 +1572,10 @@ JW.extend(JW.Array, JW.Class, {
 	},
 	
 	createEmpty: function() {
+		return new JW.Array();
+	},
+	
+	createEmptyArray: function() {
 		return new JW.Array();
 	},
 	
@@ -920,7 +1628,7 @@ JW.extend(JW.Array, JW.Class, {
 	},
 	
 	clone: function() {
-		return this.items.concat();
+		return new JW.Array(this.items.concat());
 	},
 	
 	getItems: function() {
@@ -928,28 +1636,28 @@ JW.extend(JW.Array, JW.Class, {
 	},
 	
 	createIndexer: function(config) {
-		return new JW.Array.Indexer(this, config);
+		return new JW.AbstractArray.Indexer(this, config);
 	},
 	
 	createInserter: function(config) {
-		return new JW.Array.Inserter(this, config);
+		return new JW.AbstractArray.Inserter(this, config);
 	},
 	
 	createLister: function(config) {
-		return new JW.Array.Lister(this, config);
+		return new JW.AbstractArray.Lister(this, config);
 	},
 	
 	createMapper: function(config) {
-		return new JW.Array.Mapper(this, config);
+		return new JW.AbstractArray.Mapper(this, config);
 	},
 	
 	createSplitter: function(config) {
-		return new JW.Array.Splitter(this, config);
+		return new JW.AbstractArray.Splitter(this, config);
 	}
 });
 
 JW.Array.prototype.getLength = JW.Array.prototype.getSize;
-JW.Array.prototype.pushItem = JW.Array.prototype.set;
+JW.Array.prototype.pushItem = JW.Array.prototype.add;
 
 JW.applyIf(JW.Array.prototype, JW.Alg.BuildMethods);
 
@@ -983,7 +1691,7 @@ JW.apply(JW.Array, {
 	
 	every: function(target, callback, scope) {
 		for (var i = 0, l = target.length; i < l; ++i) {
-			if (callback.call(scope || target, target[i], i, target) === false) {
+			if (callback.call(scope || target, target[i], i) === false) {
 				return false;
 			}
 		}
@@ -1141,360 +1849,6 @@ JW.applyIf(
 	
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
-JW.Array.Indexer = function(source, config) {
-	JW.Array.Indexer._super.call(this);
-	this.source = source;
-	this.getKey = config.getKey;
-	this._targetCreated = !config.target;
-	this.target = config.target || this.source.createEmptyMap();
-	this.scope = config.scope;
-	this.target.setAll(this._index(this.source.getItems()));
-};
-
-JW.extend(JW.Array.Indexer/*<T extends Any>*/, JW.Class, {
-	/*
-	Required
-	JW.Array<T> source;
-	String getKey(T item);
-	
-	Optional
-	JW.Map<T> target;
-	Object scope;
-	
-	Fields
-	Boolean _targetCreated;
-	*/
-	
-	destroy: function() {
-		this.target.removeAll(this._keys(this.source.getItems()));
-		if (this._targetCreated) {
-			this.target.destroy();
-		}
-		this._super();
-	},
-	
-	_index: function(items) {
-		return JW.Array.index(items, this.getKey, this.scope || this);
-	},
-	
-	_keys: function(items) {
-		return JW.Array.map(items, this.getKey, this.scope || this);
-	}
-});
-
-/*
-	jWidget Lib source file.
-	
-	Copyright (C) 2013 Egor Nepomnyaschih
-	
-	This program is free software: you can redistribute it and/or modify
-	it under the terms of the GNU Lesser General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
-	
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU Lesser General Public License for more details.
-	
-	You should have received a copy of the GNU Lesser General Public License
-	along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
-JW.Array.Inserter = function(source, config) {
-	JW.Array.Inserter._super.call(this);
-	this.source = source;
-	this.addItem = config.addItem;
-	this.removeItem = config.removeItem;
-	this.scope = config.scope;
-	this.clearItems = config.clearItems;
-	this._fill();
-};
-
-JW.extend(JW.Array.Inserter/*<T extends Any>*/, JW.Class, {
-	/*
-	Required
-	JW.Array<T> source;
-	void addItem(T item, Integer index);
-	void removeItem(Integer index, T item);
-	
-	Optional
-	Object scope; // defaults to this
-	void clearItems(Array<T> items);
-	*/
-	
-	destroy: function() {
-		this._clear(this.source.getItems());
-		this._super();
-	},
-	
-	_addItem: function(item, index) {
-		this.addItem.call(this.scope || this, item, index);
-	},
-	
-	_addItems: function(items, index) {
-		for (var i = 0; i < items.length; ++i) {
-			this._addItem(items[i], i + index);
-		}
-	},
-	
-	_removeItem: function(item, index) {
-		this.removeItem.call(this.scope || this, index, item);
-	},
-	
-	_removeItems: function(items, index) {
-		for (var i = items.length - 1; i >= 0; --i) {
-			this._removeItem(items[i], i + index);
-		}
-	},
-	
-	_fill: function() {
-		this._addItems(this.source.getItems().concat(), 0);
-	},
-	
-	_clear: function(items) {
-		if (items.length === 0) {
-			return;
-		}
-		if (this.clearItems) {
-			this.clearItems.call(this.scope || this, items);
-		} else {
-			this._removeItems(items, 0);
-		}
-	}
-});
-
-/*
-	jWidget Lib source file.
-	
-	Copyright (C) 2013 Egor Nepomnyaschih
-	
-	This program is free software: you can redistribute it and/or modify
-	it under the terms of the GNU Lesser General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
-	
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU Lesser General Public License for more details.
-	
-	You should have received a copy of the GNU Lesser General Public License
-	along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
-JW.Array.Lister = function(source, config) {
-	JW.Array.Lister._super.call(this);
-	this.source = source;
-	this._targetCreated = !config.target;
-	this.target = config.target || this.source.createEmptySet();
-	this.target.addAll(this.source.getItems());
-};
-
-JW.extend(JW.Array.Lister/*<T extends JW.Class>*/, JW.Class, {
-	/*
-	Required
-	JW.Array<T> source;
-	
-	Optional
-	JW.Set<T> target;
-	
-	Fields
-	Boolean _targetCreated;
-	*/
-	
-	destroy: function() {
-		this.target.removeAll(this.source.getItems());
-		if (this._targetCreated) {
-			this.target.destroy();
-		}
-		this._super();
-	}
-});
-
-/*
-	jWidget Lib source file.
-	
-	Copyright (C) 2013 Egor Nepomnyaschih
-	
-	This program is free software: you can redistribute it and/or modify
-	it under the terms of the GNU Lesser General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
-	
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU Lesser General Public License for more details.
-	
-	You should have received a copy of the GNU Lesser General Public License
-	along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
-JW.Array.Mapper = function(source, config) {
-	JW.Array.Mapper._super.call(this);
-	this.source = source;
-	this.createItem = config.createItem;
-	this.destroyItem = config.destroyItem;
-	this._targetCreated = !config.target;
-	this.target = config.target || this.source.createEmpty();
-	this.scope = config.scope;
-	this.target.addAll(this._fill());
-};
-
-JW.extend(JW.Array.Mapper/*<S extends JW.Class, T extends JW.Class>*/, JW.Class, {
-	/*
-	Required
-	JW.Array<S> source;
-	T createItem(S data);
-	void destroyItem(T item, S data);
-	
-	Optional
-	JW.Array<T> target;
-	Object scope; // defaults to this
-	
-	Fields
-	Boolean _targetCreated;
-	*/
-	
-	destroy: function() {
-		this._clear(this.source.getItems());
-		if (this._targetCreated) {
-			this.target.destroy();
-		}
-		this._super();
-	},
-	
-	_clear: function(datas) {
-		var items = this.target.clear();
-		for (var i = items.length - 1; i >= 0; --i) {
-			this.destroyItem.call(this.scope || this, items[i], datas[i]);
-		}
-	},
-	
-	_fill: function() {
-		return JW.Array.map(this.source.getItems(), this.createItem, this.scope || this);
-	}
-});
-
-/*
-	jWidget Lib source file.
-	
-	Copyright (C) 2013 Egor Nepomnyaschih
-	
-	This program is free software: you can redistribute it and/or modify
-	it under the terms of the GNU Lesser General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
-	
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU Lesser General Public License for more details.
-	
-	You should have received a copy of the GNU Lesser General Public License
-	along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
-JW.Array.Splitter = function(source, config) {
-	JW.Array.Splitter._super.call(this);
-	this.source = source;
-	this._rowsCreated = !config.rows;
-	this.rows = config.rows || this.source.createEmpty();
-	this.capacity = config.capacity || 1;
-	this._length = 0;
-	
-	this._inserter = this.source.createInserter({
-		addItem    : this._addItem,
-		removeItem : this._removeItem,
-		clearItems : this._clearItems,
-		scope      : this
-	});
-};
-
-JW.extend(JW.Array.Splitter/*<T extends Any, R extends JW.Array<T>>*/, JW.Class, {
-	/*
-	Required
-	JW.Array<T> source;
-	
-	Optional
-	JW.Array<R> rows;
-	Integer capacity;
-	
-	Fields
-	Boolean _rowsCreated;
-	Integer _length;
-	JW.Array.Inserter<T> _inserter;
-	*/
-	
-	destroy: function() {
-		this._inserter.destroy();
-		if (this._rowsCreated) {
-			this.rows.destroy();
-		}
-		this._super();
-	},
-	
-	createRow: function() {
-		return this.source.createEmpty();
-	},
-	
-	destroyRow: function(row) {
-		row.destroy();
-	},
-	
-	_addItem: function(item, index) {
-		if (this._length % this.capacity === 0) {
-			this.rows.add(this.createRow.call(this.scope || this));
-		}
-		var firstRow = Math.floor(index / this.capacity);
-		for (var i = this.rows.getLength() - 1; i > firstRow; --i) {
-			var broughtItem = this.rows.get(i - 1).remove(this.capacity - 1);
-			this.rows.get(i).add(broughtItem, 0);
-		}
-		this.rows.get(firstRow).add(item, index % this.capacity);
-		++this._length;
-	},
-	
-	_removeItem: function(index) {
-		var firstRow = Math.floor(index / this.capacity);
-		this.rows.get(firstRow).remove(index % this.capacity);
-		for (var i = firstRow + 1; i < this.rows.getLength(); ++i) {
-			var broughtItem = this.rows.get(i).remove(0);
-			this.rows.get(i - 1).add(broughtItem, this.capacity - 1);
-		}
-		--this._length;
-		if (this._length % this.capacity === 0) {
-			this.destroyRow.call(this.scope || this, this.rows.remove(this.rows.getLength() - 1));
-		}
-	},
-	
-	_clearItems: function() {
-		var rows = this.rows.clear();
-		this._length = 0;
-		JW.Array.each(rows, this.destroyRow, this.scope || this);
-	}
-});
-
-/*
-	jWidget Lib source file.
-	
-	Copyright (C) 2013 Egor Nepomnyaschih
-	
-	This program is free software: you can redistribute it and/or modify
-	it under the terms of the GNU Lesser General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
-	
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU Lesser General Public License for more details.
-	
-	You should have received a copy of the GNU Lesser General Public License
-	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	
 	----
 	
@@ -1518,6 +1872,10 @@ JW.extend(JW.Map/*<T extends Any>*/, JW.Class, {
 	Map<T> json;
 	Integer size;
 	*/
+	
+	getJson: function() {
+		return this.json;
+	},
 	
 	getSize: function() {
 		return this.size;
@@ -1574,6 +1932,26 @@ JW.extend(JW.Map/*<T extends Any>*/, JW.Class, {
 		return new JW.Map();
 	},
 	
+	createEmptyArray: function() {
+		return new JW.Array();
+	},
+	
+	createEmptyMap: function() {
+		return new JW.Map();
+	},
+	
+	createEmptySet: function() {
+		return new JW.Set();
+	},
+	
+	createLister: function(config) {
+		return new JW.AbstractMap.Lister(this, config);
+	},
+	
+	createMapper: function(config) {
+		return new JW.AbstractMap.Mapper(this, config);
+	},
+	
 	equal: function(map) {
 		if (this === map) {
 			return true;
@@ -1593,6 +1971,8 @@ JW.extend(JW.Map/*<T extends Any>*/, JW.Class, {
 
 JW.Map.prototype.getLength = JW.Map.prototype.getSize;
 JW.Map.prototype.pushItem = JW.Map.prototype.set;
+JW.Map.prototype._set = JW.Map.prototype.set;
+JW.Map.prototype._remove = JW.Map.prototype.remove;
 
 JW.applyIf(JW.Map.prototype, JW.Alg.BuildMethods);
 
@@ -1708,6 +2088,10 @@ JW.extend(JW.Set/*<T extends JW.Class>*/, JW.Class, {
 	Integer size;
 	*/
 	
+	getJson: function() {
+		return this.json;
+	},
+	
 	getSize: function() {
 		return this.size;
 	},
@@ -1757,11 +2141,49 @@ JW.extend(JW.Set/*<T extends JW.Class>*/, JW.Class, {
 	
 	createEmpty: function() {
 		return new JW.Set();
+	},
+	
+	createEmptyArray: function() {
+		return new JW.Array();
+	},
+	
+	createEmptyMap: function() {
+		return new JW.Map();
+	},
+	
+	createEmptySet: function() {
+		return new JW.Set();
+	},
+	
+	createIndexer: function(config) {
+		return new JW.AbstractSet.Indexer(this, config);
+	},
+	
+	createMapper: function(config) {
+		return new JW.AbstractSet.Mapper(this, config);
+	},
+	
+	equal: function(set) {
+		if (this === set) {
+			return true;
+		}
+		if (this.getSize() !== set.getSize()) {
+			return false;
+		}
+		var json = this.json;
+		for (var key in json) {
+			if (set.get(key) !== json[key]) {
+				return false;
+			}
+		}
+		return true;
 	}
 });
 
 JW.Set.prototype.getLength = JW.Set.prototype.getSize;
 JW.Set.prototype.pushItem = JW.Set.prototype.add;
+JW.Set.prototype._add = JW.Set.prototype.add;
+JW.Set.prototype._remove = JW.Set.prototype.remove;
 
 JW.applyIf(JW.Set.prototype, JW.Alg.BuildMethods);
 
@@ -1802,6 +2224,19 @@ JW.apply(JW.Set, {
 		return true;
 	},
 	
+	equal: function(x, y) {
+		if (x === y) {
+			return true;
+		}
+		var size = JW.Set.getSize(y);
+		for (var key in x) {
+			if ((--size < 0) || (x[key] !== y[key])) {
+				return false;
+			}
+		}
+		return size === 0;
+	},
+	
 	clone: JW.Map.clone
 });
 
@@ -1833,7 +2268,7 @@ JW.applyIf(
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-// TODO: tests for bulk changes
+// TODO: tests and document bulk changes
 
 JW.ObservableArray = function(items) {
 	JW.ObservableArray._super.call(this);
@@ -1999,6 +2434,10 @@ JW.extend(JW.ObservableArray/*<T extends Any>*/, JW.Class, {
 		return new JW.ObservableArray();
 	},
 	
+	createEmptyArray: function() {
+		return new JW.ObservableArray();
+	},
+	
 	createEmptyMap: function() {
 		return new JW.ObservableMap();
 	},
@@ -2028,7 +2467,7 @@ JW.extend(JW.ObservableArray/*<T extends Any>*/, JW.Class, {
 	},
 	
 	createSplitter: function(config) {
-		return new JW.Array.Splitter(this, config);
+		return new JW.ObservableArray.Splitter(this, config);
 	},
 	
 	_triggerChange: function() {
@@ -2173,7 +2612,7 @@ JW.ObservableArray.Indexer = function(source, config) {
 	this._resetEventAttachment = this.source.resetEvent.bind(this._onReset, this);
 };
 
-JW.extend(JW.ObservableArray.Indexer/*<T extends Any>*/, JW.Array.Indexer/*<T>*/, {
+JW.extend(JW.ObservableArray.Indexer/*<T extends Any>*/, JW.AbstractArray.Indexer/*<T>*/, {
 	/*
 	Required
 	JW.ObservableArray<T> source;
@@ -2266,31 +2705,31 @@ JW.ObservableArray.Inserter = function(source, config) {
 	this._resetEventAttachment = this.source.resetEvent.bind(this._onReset, this);
 };
 
-JW.extend(JW.ObservableArray.Inserter/*<T extends Any>*/, JW.Array.Inserter/*<T>*/, {
+JW.extend(JW.ObservableArray.Inserter/*<T extends Any>*/, JW.AbstractArray.Inserter/*<T>*/, {
 	/*
 	Required
 	JW.ObservableArray<T> source;
 	
 	Fields
-	EventAttachment _addEventAttachment;
-	EventAttachment _removeEventAttachment;
-	EventAttachment _replaceEventAttachment;
-	EventAttachment _moveEventAttachment;
-	EventAttachment _clearEventAttachment;
-	EventAttachment _reorderEventAttachment;
-	EventAttachment _filterEventAttachment;
-	EventAttachment _resetEventAttachment;
+	JW.EventAttachment _addEventAttachment;
+	JW.EventAttachment _removeEventAttachment;
+	JW.EventAttachment _replaceEventAttachment;
+	JW.EventAttachment _moveEventAttachment;
+	JW.EventAttachment _clearEventAttachment;
+	JW.EventAttachment _reorderEventAttachment;
+	JW.EventAttachment _filterEventAttachment;
+	JW.EventAttachment _resetEventAttachment;
 	*/
 	
 	destroy: function() {
-		this._addEventAttachment.destroy();
-		this._removeEventAttachment.destroy();
-		this._replaceEventAttachment.destroy();
-		this._moveEventAttachment.destroy();
-		this._clearEventAttachment.destroy();
-		this._reorderEventAttachment.destroy();
-		this._filterEventAttachment.destroy();
 		this._resetEventAttachment.destroy();
+		this._filterEventAttachment.destroy();
+		this._reorderEventAttachment.destroy();
+		this._clearEventAttachment.destroy();
+		this._moveEventAttachment.destroy();
+		this._replaceEventAttachment.destroy();
+		this._removeEventAttachment.destroy();
+		this._addEventAttachment.destroy();
 		this._super();
 	},
 	
@@ -2379,7 +2818,7 @@ JW.ObservableArray.Lister = function(source, config) {
 	this._resetEventAttachment = this.source.resetEvent.bind(this._onReset, this);
 };
 
-JW.extend(JW.ObservableArray.Lister/*<T extends JW.Class>*/, JW.Array.Lister/*<T>*/, {
+JW.extend(JW.ObservableArray.Lister/*<T extends JW.Class>*/, JW.AbstractArray.Lister/*<T>*/, {
 	/*
 	Required
 	JW.ObservableArray<T> source;
@@ -2477,7 +2916,7 @@ JW.ObservableArray.Mapper = function(source, config) {
 	this._resetEventAttachment = this.source.resetEvent.bind(this._onReset, this);
 };
 
-JW.extend(JW.ObservableArray.Mapper/*<S extends JW.Class, T extends JW.Class>*/, JW.Array.Mapper/*<S, T>*/, {
+JW.extend(JW.ObservableArray.Mapper/*<S extends Any, T extends Any>*/, JW.AbstractArray.Mapper/*<S, T>*/, {
 	/*
 	Required
 	JW.ObservableArray<S> source;
@@ -2509,7 +2948,7 @@ JW.extend(JW.ObservableArray.Mapper/*<S extends JW.Class, T extends JW.Class>*/,
 	},
 	
 	getKey: function(data) {
-		return data._iid;
+		return data._iid || data;
 	},
 	
 	_onAdd: function(params) {
@@ -2621,6 +3060,27 @@ JW.extend(JW.ObservableArray.Mapper/*<S extends JW.Class, T extends JW.Class>*/,
 	
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+JW.ObservableArray.Splitter = JW.AbstractArray.Splitter.extend();
+
+/*
+	jWidget Lib source file.
+	
+	Copyright (C) 2013 Egor Nepomnyaschih
+	
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU Lesser General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+	
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU Lesser General Public License for more details.
+	
+	You should have received a copy of the GNU Lesser General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	
 	----
 	
@@ -2664,6 +3124,10 @@ JW.extend(JW.ObservableMap/*<T extends Any>*/, JW.Class, {
 		this.removeEvent.destroy();
 		this.addEvent.destroy();
 		this._super();
+	},
+	
+	getJson: function() {
+		return this.map.getJson();
 	},
 	
 	getSize: function() {
@@ -2746,6 +3210,26 @@ JW.extend(JW.ObservableMap/*<T extends Any>*/, JW.Class, {
 	
 	createEmpty: function() {
 		return new JW.ObservableMap();
+	},
+	
+	createEmptyArray: function() {
+		return new JW.ObservableArray();
+	},
+	
+	createEmptyMap: function() {
+		return new JW.ObservableMap();
+	},
+	
+	createEmptySet: function() {
+		return new JW.ObservableSet();
+	},
+	
+	createLister: function(config) {
+		return new JW.ObservableMap.Lister(this, config);
+	},
+	
+	createMapper: function(config) {
+		return new JW.ObservableMap.Mapper(this, config);
 	},
 	
 	_set: function(item, key) {
@@ -2875,57 +3359,34 @@ JW.extend(JW.ObservableMap.SizeChangeEventParams/*<T extends Any>*/, JW.Observab
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-JW.ObservableMap.Lister = function(config) {
-	JW.ObservableMap.Lister._super.call(this);
-	this.source = config.source;
-	this._targetCreated = !config.target;
-	this.target = config.target || new JW.ObservableSet();
+JW.ObservableMap.Lister = function(source, config) {
+	JW.ObservableMap.Lister._super.call(this, source, config);
 	this._addEventAttachment = this.source.addEvent.bind(this._onAdd, this);
 	this._removeEventAttachment = this.source.removeEvent.bind(this._onRemove, this);
 	this._changeEventAttachment = this.source.changeEvent.bind(this._onChange, this);
-	this.target.addAll(this.source.getValuesArray());
 };
 
-JW.extend(JW.ObservableMap.Lister/*<T extends JW.Class>*/, JW.Class, {
+JW.extend(JW.ObservableMap.Lister/*<T extends JW.Class>*/, JW.AbstractMap.Lister/*<T>*/, {
 	/*
-	Required
-	JW.ObservableMap<T> source;
-	
-	Optional
-	JW.ObservableSet<T> target;
-	
 	Fields
-	Boolean _targetCreated;
 	EventAttachment _addEventAttachment;
 	EventAttachment _removeEventAttachment;
 	EventAttachment _changeEventAttachment;
 	*/
 	
 	destroy: function() {
-		this.target.clear();
 		this._changeEventAttachment.destroy();
 		this._removeEventAttachment.destroy();
 		this._addEventAttachment.destroy();
-		if (this._targetCreated) {
-			this.target.destroy();
-		}
 		this._super();
 	},
 	
-	_add: function(item) {
-		this.target._add(item);
-	},
-	
-	_remove: function(item) {
-		this.target._remove(item);
-	},
-	
 	_onAdd: function(params) {
-		this._add(params.item);
+		this.target._add(params.item);
 	},
 	
 	_onRemove: function(params) {
-		this._remove(params.item);
+		this.target._remove(params.item);
 	},
 	
 	_onChange: function() {
@@ -2952,65 +3413,31 @@ JW.extend(JW.ObservableMap.Lister/*<T extends JW.Class>*/, JW.Class, {
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-JW.ObservableMap.Mapper = function(config) {
-	JW.ObservableMap.Mapper._super.call(this);
-	this.source = config.source;
-	this.createItem = config.createItem;
-	this.destroyItem = config.destroyItem;
-	this._targetCreated = !config.target;
-	this.target = config.target || new JW.ObservableMap();
-	this.scope = config.scope;
+JW.ObservableMap.Mapper = function(source, config) {
+	JW.ObservableMap.Mapper._super.call(this, source, config);
 	this._addEventAttachment = this.source.addEvent.bind(this._onAdd, this);
 	this._removeEventAttachment = this.source.removeEvent.bind(this._onRemove, this);
 	this._changeEventAttachment = this.source.changeEvent.bind(this._onChange, this);
-	this._destructionQueue = [];
-	this.target.setAll(JW.Map.map(this.source.map.json, this.createItem, this.scope || this));
 };
 
-JW.extend(JW.ObservableMap.Mapper/*<S extends Any, T extends Any>*/, JW.Class, {
+JW.extend(JW.ObservableMap.Mapper/*<S extends Any, T extends Any>*/, JW.AbstractMap.Mapper/*<S, T>*/, {
 	/*
-	Required
-	JW.ObservableMap<S> source;
-	T createItem(S data, String key);
-	void destroyItem(T item, S data, String key);
-	
-	Optional
-	JW.ObservableMap<T> target;
-	Object scope; // defaults to this
-	
 	Fields
-	Boolean _targetCreated;
 	EventAttachment _addEventAttachment;
 	EventAttachment _removeEventAttachment;
 	EventAttachment _changeEventAttachment;
-	Array<Array> _destructionQueue;
 	*/
 	
 	destroy: function() {
-		if (!this.source.isEmpty()) {
-			this.source.every(this._remove, this);
-			this._change();
-		}
 		this._changeEventAttachment.destroy();
 		this._removeEventAttachment.destroy();
 		this._addEventAttachment.destroy();
-		if (this._targetCreated) {
-			this.target.destroy();
-		}
 		this._super();
-	},
-	
-	_remove: function(data, key) {
-		this._destructionQueue.push([ this.target._remove(key), data, key ]);
 	},
 	
 	_change: function() {
 		this.target._triggerChange();
-		for (var i = 0; i < this._destructionQueue.length; ++i) {
-			var params = this._destructionQueue[i];
-			this.destroyItem.call(this.scope || this, params[0], params[1], params[2]);
-		}
-		this._destructionQueue = [];
+		this._super();
 	},
 	
 	_onAdd: function(params) {
@@ -3086,6 +3513,10 @@ JW.extend(JW.ObservableSet/*<T extends JW.Class>*/, JW.Class, {
 		this.removeEvent.destroy();
 		this.addEvent.destroy();
 		this._super();
+	},
+	
+	getJson: function() {
+		return this.set.getJson();
 	},
 	
 	getSize: function() {
@@ -3168,6 +3599,26 @@ JW.extend(JW.ObservableSet/*<T extends JW.Class>*/, JW.Class, {
 	
 	createEmpty: function() {
 		return new JW.ObservableSet();
+	},
+	
+	createEmptyArray: function() {
+		return new JW.ObservableArray();
+	},
+	
+	createEmptyMap: function() {
+		return new JW.ObservableMap();
+	},
+	
+	createEmptySet: function() {
+		return new JW.ObservableSet();
+	},
+	
+	createIndexer: function(config) {
+		return new JW.ObservableSet.Indexer(this, config);
+	},
+	
+	createMapper: function(config) {
+		return new JW.ObservableSet.Mapper(this, config);
 	},
 	
 	_add: function(item) {
@@ -3281,59 +3732,32 @@ JW.extend(JW.ObservableSet.SizeChangeEventParams/*<T extends JW.Class>*/, JW.Obs
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-JW.ObservableSet.Indexer = function(config) {
-	JW.ObservableSet.Indexer._super.call(this);
-	this.source = config.source;
-	this.getKey = config.getKey;
-	this._targetCreated = !config.target;
-	this.target = config.target || new JW.ObservableMap();
-	this.scope = config.scope;
+JW.ObservableSet.Indexer = function(source, config) {
+	JW.ObservableSet.Indexer._super.call(this, source, config);
 	this._addEventAttachment = this.source.addEvent.bind(this._onAdd, this);
 	this._removeEventAttachment = this.source.removeEvent.bind(this._onRemove, this);
 	this._changeEventAttachment = this.source.changeEvent.bind(this._onChange, this);
-	if (!this.source.isEmpty()) {
-		this.source.every(this._add, this);
-		this.target._triggerChange();
-	}
 };
 
-JW.extend(JW.ObservableSet.Indexer/*<T extends JW.Class>*/, JW.Class, {
+JW.extend(JW.ObservableSet.Indexer/*<T extends JW.Class>*/, JW.AbstractSet.Indexer/*<T>*/, {
 	/*
-	Required
-	JW.ObservableSet<T> source;
-	String getKey(T item);
-	
-	Optional
-	JW.ObservableMap<T> target;
-	Object scope;
-	
 	Fields
-	Boolean _targetCreated;
 	EventAttachment _addEventAttachment;
 	EventAttachment _removeEventAttachment;
 	EventAttachment _changeEventAttachment;
 	*/
 	
+	// override
 	destroy: function() {
-		if (!this.source.isEmpty()) {
-			this.source.every(this._remove, this);
-			this.target._triggerChange();
-		}
 		this._changeEventAttachment.destroy();
 		this._removeEventAttachment.destroy();
 		this._addEventAttachment.destroy();
-		if (this._targetCreated) {
-			this.target.destroy();
-		}
 		this._super();
 	},
 	
-	_add: function(item) {
-		this.target._set(item, this.getKey.call(this.scope || this, item));
-	},
-	
-	_remove: function(item) {
-		this.target._remove(this.getKey.call(this.scope || this, item));
+	// override
+	_change: function() {
+		this.target._triggerChange();
 	},
 	
 	_onAdd: function(params) {
@@ -3344,8 +3768,9 @@ JW.extend(JW.ObservableSet.Indexer/*<T extends JW.Class>*/, JW.Class, {
 		this._remove(params.item);
 	},
 	
+	// override
 	_onChange: function() {
-		this.target._triggerChange();
+		this._change();
 	}
 });
 
@@ -3368,79 +3793,31 @@ JW.extend(JW.ObservableSet.Indexer/*<T extends JW.Class>*/, JW.Class, {
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-JW.ObservableSet.Mapper = function(config) {
-	JW.ObservableSet.Mapper._super.call(this);
-	this.source = config.source;
-	this.createItem = config.createItem;
-	this.destroyItem = config.destroyItem;
-	this._targetCreated = !config.target;
-	this.target = config.target || new JW.ObservableSet();
-	this.scope = config.scope;
-	this._items = {};
+JW.ObservableSet.Mapper = function(source, config) {
+	JW.ObservableSet.Mapper._super.call(this, source, config);
 	this._addEventAttachment = this.source.addEvent.bind(this._onAdd, this);
 	this._removeEventAttachment = this.source.removeEvent.bind(this._onRemove, this);
 	this._changeEventAttachment = this.source.changeEvent.bind(this._onChange, this);
-	this._destructionQueue = [];
-	if (!this.source.isEmpty()) {
-		this.source.every(this._add, this);
-		this._change();
-	}
 };
 
-JW.extend(JW.ObservableSet.Mapper/*<S extends JW.Class, T extends JW.Class>*/, JW.Class, {
+JW.extend(JW.ObservableSet.Mapper/*<S extends JW.Class, T extends JW.Class>*/, JW.AbstractSet.Mapper/*<S, T>*/, {
 	/*
-	Required
-	JW.ObservableSet<S> source;
-	T createItem(S data);
-	void destroyItem(T item, S data);
-	
-	Optional
-	JW.ObservableSet<T> target;
-	Object scope; // defaults to this
-	
 	Fields
-	Boolean _targetCreated;
-	Map<T> _items;
 	EventAttachment _addEventAttachment;
 	EventAttachment _removeEventAttachment;
 	EventAttachment _changeEventAttachment;
-	Array<Array> _destructionQueue;
 	*/
 	
 	destroy: function() {
-		if (!this.source.isEmpty()) {
-			this.source.every(this._remove, this);
-			this._change();
-		}
 		this._changeEventAttachment.destroy();
 		this._removeEventAttachment.destroy();
 		this._addEventAttachment.destroy();
-		if (this._targetCreated) {
-			this.target.destroy();
-		}
 		this._super();
-	},
-	
-	_add: function(data) {
-		var item = this.createItem.call(this.scope || this, data);
-		this.target._add(item);
-		this._items[data._iid] = item;
-	},
-	
-	_remove: function(data) {
-		var item = this._items[data._iid];
-		delete this._items[data._iid];
-		this.target._remove(item);
-		this._destructionQueue.push([ item, data ]);
 	},
 	
 	_change: function() {
 		this.target._triggerChange();
-		for (var i = 0; i < this._destructionQueue.length; ++i) {
-			var params = this._destructionQueue[i];
-			this.destroyItem.call(this.scope || this, params[0], params[1]);
-		}
-		this._destructionQueue = [];
+		this._super();
 	},
 	
 	_onAdd: function(params) {
@@ -3696,9 +4073,9 @@ JW.String = {
 JW.Timer = function(delay, repeat, sensitive) {
 	JW.Timer._super.call(this);
 	this.tickEvent = new JW.Event();
-	this.delay = delay;
-	this.repeat = repeat;
-	this.sensitive = sensitive;
+	this.delay = delay || 0;
+	this.repeat = repeat || false;
+	this.sensitive = sensitive || false;
 	this._handle = 0;
 	this._onTimeout = JW.inScope(this._onTimeout, this);
 };
@@ -3733,7 +4110,7 @@ JW.extend(JW.Timer, JW.Class, {
 		}
 		var stopper = this._getStopper();
 		stopper(this._handle);
-		this._handle = 0;;
+		this._handle = 0;
 	},
 	
 	restart: function() {
@@ -3754,17 +4131,11 @@ JW.extend(JW.Timer, JW.Class, {
 	},
 	
 	_onTimeout: function() {
+		if (!this.repeat) {
+			this._handle = 0;
+		}
 		this.tickEvent.trigger(new JW.Timer.EventParams(this));
 	}
 });
 
-JW.Timer.EventParams = function(sender) {
-	JW.Timer.EventParams._super.call(this, sender);
-};
-
-JW.extend(JW.Timer.EventParams, JW.EventParams, {
-	/*
-	Fields
-	JW.Timer sender;
-	*/
-});
+JW.Timer.EventParams = JW.EventParams.extend();

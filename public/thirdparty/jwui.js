@@ -70,9 +70,9 @@ JW.apply(jQuery.fn, {
 		}
 	},
 	
-	replaceBy: function(el) {
-		var id = this.attr("id"),
-			cls = this.attr("class");
+	replaceBy: function(el, attrs) {
+		var id = attrs ? this.attr("id") : null,
+			cls = attrs ? this.attr("class") : null;
 		
 		el = jQuery(el);
 		this.after(el);
@@ -212,8 +212,8 @@ JW.UI.Component = function(config) {
 	this.destroyed = false;
 	this.el = null;
 	this.children = null;
+	this.allChildren = null;
 	this._elements = null;
-	this._allChildren = null;
 	this._childMapper = null;
 	this._arrays = null;
 },
@@ -232,8 +232,8 @@ JW.extend(JW.UI.Component, JW.Class, {
 	Fields (rendering)
 	Element el;
 	JW.ObservableMap<JW.UI.Component> children; // named children
+	Set<JW.UI.Component> allChildren; // children + (arrays' contents)
 	Map<Element> _elements;
-	Set<JW.UI.Component> _allChildren; // children + (arrays' contents)
 	JW.ObservableMap.Mapper<JW.UI.Component, JW.UI.Component.Child> _childMapper;
 	Set<JW.UI.Component.Array> _arrays;
 	*/
@@ -259,7 +259,7 @@ JW.extend(JW.UI.Component, JW.Class, {
 			this.children.destroy();
 			this.children = null;
 		}
-		this._allChildren = null;
+		this.allChildren = null;
 		this._elements = null;
 		this.el = null;
 		this._super();
@@ -279,7 +279,7 @@ JW.extend(JW.UI.Component, JW.Class, {
 		}
 		this.el = jQuery(this.template || this.templates.main);
 		this._elements = {};
-		this._allChildren = {};
+		this.allChildren = {};
 		this.children = new JW.ObservableMap();
 		this._arrays = {};
 		this.rootClass = this.rootClass || this.el.attr("jwclass");
@@ -304,7 +304,7 @@ JW.extend(JW.UI.Component, JW.Class, {
 				this.children.set(this[renderMethodName].call(this), jwId);
 			}
 		}
-		this._childMapper = new JW.ObservableMap.Mapper({
+		this._childMapper = this.children.createMapper({
 			source      : this.children,
 			createItem  : function(child, name) { return new JW.UI.Component.Child(this, child, name); },
 			destroyItem : function(componentChild) { componentChild.destroy(); },
@@ -321,7 +321,7 @@ JW.extend(JW.UI.Component, JW.Class, {
 	
 	renderAs: function(el) {
 		this.render();
-		jQuery(el).replaceBy(this.el);
+		jQuery(el).replaceBy(this.el, true);
 		this._afterAppend();
 	},
 	
@@ -365,17 +365,17 @@ JW.extend(JW.UI.Component, JW.Class, {
 		}
 		this.wasAfterAppend = true;
 		this.afterAppend();
-		JW.Set.eachByMethod(this._allChildren, "_afterAppend");
+		JW.Set.eachByMethod(this.allChildren, "_afterAppend");
 	},
 	
 	_initChild: function(component) {
 		component.render();
 		component.parent = this;
-		JW.Set.add(this._allChildren, component);
+		JW.Set.add(this.allChildren, component);
 	},
 	
 	_doneChild: function(component) {
-		JW.Set.remove(this._allChildren, component);
+		JW.Set.remove(this.allChildren, component);
 		component.parent = null;
 	},
 	
@@ -476,7 +476,7 @@ JW.UI.Component.Child = function(parent, child, name) {
 	this._el = this.parent.getElement(name);
 	this.parent._initChild(this.child);
 	this.parent._elements[name] = this.child.el;
-	this._el.replaceBy(this.child.el);
+	this._el.replaceBy(this.child.el, true);
 	this.child._afterAppend();
 };
 
