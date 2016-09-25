@@ -6,36 +6,36 @@
 	
 	answers : [
 		[
-			{ text: "РАБОТАТЬ", price: 44 },
-			{ text: "ИГРАТЬ", price: 20 },
-			{ text: "ПИТЬ ПИВО", price: 13 },
-			{ text: "В ИНТЕРНЕТ", price: 10 },
-			{ text: "ДОМОЙ", price: 8 },
-			{ text: "СПАТЬ", price: 5 }
+			{ text: "МУЖЧИНА", price: 26 },
+			{ text: "АНАЛИТИК", price: 18},
+			{ text: "КАРЛ", price: 11 },
+			{ text: "КТО-ТО УМНЫЙ", price: 10 },
+			{ text: "ПИСАТЕЛЬ", price: 9 },
+			{ text: "БРАТ СНИКЕРСА", price: 6 }
 		],
 		[
-			{ text: "БРЕЕТ", price: 37 },
-			{ text: "НЕ РАСТЕТ", price: 28 },
-			{ text: "ПЛОХО РАБОТАЕТ", price: 17 },
-			{ text: "БОРОДА ПОЛНИТ", price: 13 },
-			{ text: "НЕ МУЖЧИНА", price: 4 },
-			{ text: "ПРЯЧЕТ", price: 1 }
+			{ text: "ПЛАТЕЖЕСПОСОБНОГО", price: 35, size: 16 },
+			{ text: "СОГЛАШАЮЩЕГОСЯ", price: 22, size: 16 },
+			{ text: "ЗНАЕТ, ЧЕГО ХОЧЕТ", price: 17, size: 16 },
+			{ text: "АДЕКВАТНОГО", price: 7 },
+			{ text: "ФРЭНКА", price: 6 },
+			{ text: "СФЕРИЧЕСКОГО", price: 5 }
 		],
 		[
-			{ text: "МИТИНГ", price: 35 },
-			{ text: "ДОМОЙ", price: 25 },
-			{ text: "КУШАТЬ", price: 19 },
-			{ text: "ДОСТАВАТЬ", price: 13 },
-			{ text: "УПРАВЛЯТЬ", price: 7 },
-			{ text: "ТРЕНИНГ", price: 1 }
+			{ text: "РЕКОМЕНДАЦИИ", price: 28 },
+			{ text: "UPWORK", price: 23 },
+			{ text: "САРАФАННОЕ РАДИО", price: 15, size: 16 },
+			{ text: "СВЯЗИ ИВАНА ВАСИЛЬЕВИЧА", price: 12, size: 14 },
+			{ text: "ПЕРВЫЙ", price: 10 },
+			{ text: "ПАНАМСКИЙ", price: 9 }
 		],
 		[
-			{ text: "НЕ ПОЛИВАЮТ", price: 15 },
-			{ text: "НЕТ ДЕВУШЕК", price: 30 },
-			{ text: "РАДИАЦИЯ", price: 60 },
-			{ text: "ХОЛОДНО", price: 120 },
-			{ text: "ИЗ-ЗА ПРОГРАММИСТОВ", price: 180, size: 14 },
-			{ text: "ПОЛИВАЮТ ЧАЕМ", price: 240 }
+			{ text: "СЛУЧАЙНОСТЬ", price: 15 },
+			{ text: "ЗАГОВОР", price: 30 },
+			{ text: "ТАК СЛОЖИЛОСЬ", price: 60 },
+			{ text: "РАВНОВЕСИЕ С HR-ОТДЕЛОМ", price: 120, size: 13 },
+			{ text: "В ОМСКЕ МЯГЧЕ КЛИМАТ", price: 180, size: 14 },
+			{ text: "ОМСК БОЛЬШЕ", price: 240 }
 		]
 	]
 };
