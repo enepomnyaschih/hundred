@@ -26,14 +26,14 @@
 			{ text: "UPWORK", price: 23 },
 			{ text: "САРАФАННОЕ РАДИО", price: 15, size: 16 },
 			{ text: "СВЯЗИ ИВАНА ВАСИЛЬЕВИЧА", price: 12, size: 14 },
-			{ text: "ПЕРВЫЙ", price: 10 },
-			{ text: "ПАНАМСКИЙ", price: 9 }
+			{ text: "CRM", price: 9 },
+			{ text: "ПАНАМСКИЙ", price: 6 }
 		],
 		[
 			{ text: "СЛУЧАЙНОСТЬ", price: 15 },
 			{ text: "ЗАГОВОР", price: 30 },
 			{ text: "ТАК СЛОЖИЛОСЬ", price: 60 },
-			{ text: "РАВНОВЕСИЕ С HR-ОТДЕЛОМ", price: 120, size: 13 },
+			{ text: "РАВНОВЕСИЕ", price: 120, size: 13 },
 			{ text: "В ОМСКЕ МЯГЧЕ КЛИМАТ", price: 180, size: 14 },
 			{ text: "ОМСК БОЛЬШЕ", price: 240 }
 		]
